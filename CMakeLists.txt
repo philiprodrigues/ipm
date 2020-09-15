@@ -29,6 +29,7 @@ target_link_libraries(IPMSender_duneDAQModule appfwk::appfwk)
 ##############################################################################
 daq_point_build_to( unittest )
 
+daq_add_unit_test(ipmSender_test IPM )
 daq_add_unit_test(Direct_test    IPM )
 daq_add_unit_test(Publisher_test    IPM )
 daq_add_unit_test(Subscriber_test    IPM )
