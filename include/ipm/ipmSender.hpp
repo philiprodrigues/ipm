@@ -39,7 +39,7 @@ public:
   // kUninitialized: the sender can't do anything yet
   // kWasEnabled: the steps necessary to enable a sender to send have been performed
   // kWasDisabled: an expected condition, where (perhaps temporarily), the sender has been found unable to send
-  // kFoundInError: the sender was found to be in an error state
+  // kFoundInError: the sender was found to be in an error state, and can't be expected to send
 
   enum class SenderStatus
   {
@@ -53,7 +53,7 @@ public:
     : theSenderStatus_(SenderStatus::kUninitialized)
   {}
 
-  bool ReadyToSend() const { return theSenderStatus_ == SenderStatus::kWasEnabled; }
+  bool ready_to_send() const { return theSenderStatus_ == SenderStatus::kWasEnabled; }
 
   void send(const char* message, int message_size)
   {
@@ -87,9 +87,9 @@ protected:
   // send_ is the heart of the interface
   virtual void send_(const char* message, int N) = 0;
 
-  void SetSenderStatus(SenderStatus thestatus) { theSenderStatus_ = thestatus; }
+  void set_sender_status(SenderStatus thestatus) { theSenderStatus_ = thestatus; }
 
-  SenderStatus GetSenderStatus() const { return theSenderStatus_; }
+  SenderStatus get_sender_status() const { return theSenderStatus_; }
 
 private:
   SenderStatus theSenderStatus_;
