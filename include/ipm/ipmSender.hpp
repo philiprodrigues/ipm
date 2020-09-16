@@ -7,11 +7,7 @@
  * Implementor of this interface is required to:
  *
  * - Implement the protected virtual send_ function, called by public non-virtual send
- * - Call "SetSenderStatus(kWasEnabled)" in order for the send function won't throw
- *
- * It's also recommended that the implementor:
- *
- * -Call SetSenderStatus() appropriately in other parts of their code
+ * - Implement the public virtual can_send function
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -36,29 +32,14 @@ class ipmSender
 {
 
 public:
-  // kUninitialized: the sender can't do anything yet
-  // kWasEnabled: the steps necessary to enable a sender to send have been performed
-  // kWasDisabled: an expected condition, where (perhaps temporarily), the sender has been found unable to send
-  // kFoundInError: the sender was found to be in an error state, and can't be expected to send
 
-  enum class SenderStatus
-  {
-    kUninitialized,
-    kWasEnabled,
-    kWasDisabled,
-    kFoundInError
-  };
+  ipmSender() = default;
 
-  ipmSender()
-    : theSenderStatus_(SenderStatus::kUninitialized)
-  {}
-
-  bool ready_to_send() const { return theSenderStatus_ == SenderStatus::kWasEnabled; }
+  virtual bool can_send() const noexcept = 0;
 
   void send(const char* message, int message_size)
   {
-
-    if (theSenderStatus_ != SenderStatus::kWasEnabled) {
+    if (!can_send()) {
       throw KnownStateForbidsSend(ERS_HERE);
     }
 
@@ -86,13 +67,6 @@ public:
 protected:
   // send_ is the heart of the interface
   virtual void send_(const char* message, int N) = 0;
-
-  void set_sender_status(SenderStatus thestatus) { theSenderStatus_ = thestatus; }
-
-  SenderStatus get_sender_status() const { return theSenderStatus_; }
-
-private:
-  SenderStatus theSenderStatus_;
 };
 
 } // namespace dunedaq::ipm

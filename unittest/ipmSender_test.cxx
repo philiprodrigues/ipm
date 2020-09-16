@@ -26,14 +26,19 @@ namespace {
   class ipmSenderImpl: public ipmSender {
 
   public:
-    bool CheckImUninitialized() { return GetSenderStatus() == SenderStatus::kUninitialized; }
-    void MakeMeReadyToSend() { SetSenderStatus(SenderStatus::kWasEnabled); }
-    void SabotageMySendingAbility() {SetSenderStatus(SenderStatus::kFoundInError); }
+    ipmSenderImpl() : can_send_(false) {}
+
+    bool can_send() const noexcept override { return can_send_; }
+    void make_me_ready_to_send() { can_send_ = true; }
+    void sabotage_my_sending_ability() { can_send_ = false; }
 
   protected:
     void send_(const char* /* message */, int /* N */ ) override {
       // Pretty unexciting stub
     }
+    
+  private:
+    bool can_send_;
     
   };
 
@@ -52,15 +57,15 @@ BOOST_AUTO_TEST_CASE(StatusChecks)
   ipmSenderImpl theSender;
   std::vector<char> random_data { 'T', 'E', 'S', 'T' };
 
-  BOOST_REQUIRE(theSender.CheckImUninitialized());
+  BOOST_REQUIRE(!theSender.can_send());
 
-  theSender.MakeMeReadyToSend();
-  BOOST_REQUIRE(theSender.ReadyToSend());
+  theSender.make_me_ready_to_send();
+  BOOST_REQUIRE(theSender.can_send());
 
   BOOST_REQUIRE_NO_THROW(theSender.send(random_data.data(), random_data.size()));
 
-  theSender.SabotageMySendingAbility();
-  BOOST_REQUIRE(!theSender.ReadyToSend());
+  theSender.sabotage_my_sending_ability();
+  BOOST_REQUIRE(!theSender.can_send());
 
   BOOST_REQUIRE_EXCEPTION(theSender.send(random_data.data(), random_data.size()), dunedaq::ipm::KnownStateForbidsSend, [&](dunedaq::ipm::KnownStateForbidsSend) { return true; });
   
@@ -69,7 +74,7 @@ BOOST_AUTO_TEST_CASE(StatusChecks)
 BOOST_AUTO_TEST_CASE(BadInput)
 {
   ipmSenderImpl theSender;
-  theSender.MakeMeReadyToSend();
+  theSender.make_me_ready_to_send();
   
   const char* badBytes = nullptr;
   BOOST_REQUIRE_EXCEPTION(theSender.send(badBytes, 10), dunedaq::ipm::NullPointerPassedToSend, [&](dunedaq::ipm::NullPointerPassedToSend) { return true; });
