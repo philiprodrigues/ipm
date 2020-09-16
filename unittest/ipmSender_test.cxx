@@ -33,7 +33,7 @@ namespace {
     void sabotage_my_sending_ability() { can_send_ = false; }
 
   protected:
-    void send_(const char* /* message */, int /* N */ ) override {
+    void send_(const char* /* message */, int /* N */, const duration_type& /* timeout */ ) override {
       // Pretty unexciting stub
     }
     
@@ -62,12 +62,12 @@ BOOST_AUTO_TEST_CASE(StatusChecks)
   theSender.make_me_ready_to_send();
   BOOST_REQUIRE(theSender.can_send());
 
-  BOOST_REQUIRE_NO_THROW(theSender.send(random_data.data(), random_data.size()));
+  BOOST_REQUIRE_NO_THROW(theSender.send(random_data.data(), random_data.size(), ipmSender::noblock));
 
   theSender.sabotage_my_sending_ability();
   BOOST_REQUIRE(!theSender.can_send());
 
-  BOOST_REQUIRE_EXCEPTION(theSender.send(random_data.data(), random_data.size()), dunedaq::ipm::KnownStateForbidsSend, [&](dunedaq::ipm::KnownStateForbidsSend) { return true; });
+  BOOST_REQUIRE_EXCEPTION(theSender.send(random_data.data(), random_data.size(), ipmSender::noblock), dunedaq::ipm::KnownStateForbidsSend, [&](dunedaq::ipm::KnownStateForbidsSend) { return true; });
   
 }
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(BadInput)
   theSender.make_me_ready_to_send();
   
   const char* badBytes = nullptr;
-  BOOST_REQUIRE_EXCEPTION(theSender.send(badBytes, 10), dunedaq::ipm::NullPointerPassedToSend, [&](dunedaq::ipm::NullPointerPassedToSend) { return true; });
+  BOOST_REQUIRE_EXCEPTION(theSender.send(badBytes, 10, ipmSender::noblock), dunedaq::ipm::NullPointerPassedToSend, [&](dunedaq::ipm::NullPointerPassedToSend) { return true; });
 
 }
 

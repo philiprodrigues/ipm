@@ -33,11 +33,15 @@ class ipmSender
 
 public:
 
+  using duration_type = std::chrono::milliseconds; 
+  static constexpr duration_type block =   std::chrono::duration_values<duration_type>::max();
+  static constexpr duration_type noblock = std::chrono::duration_values<duration_type>::zero();
+  
   ipmSender() = default;
 
   virtual bool can_send() const noexcept = 0;
 
-  void send(const char* message, int message_size)
+  void send(const char* message, int message_size, const duration_type& timeout)
   {
     if (!can_send()) {
       throw KnownStateForbidsSend(ERS_HERE);
@@ -47,14 +51,14 @@ public:
       throw NullPointerPassedToSend(ERS_HERE);
     }
 
-    send_(message, message_size);
+    send_(message, message_size, timeout);
   }
 
-  void send(const char** message_parts, const std::vector<int>& message_sizes)
+  void send(const char** message_parts, const std::vector<int>& message_sizes, const duration_type& timeout)
   {
 
     for (size_t i = 0; i < message_sizes.size(); ++i) {
-      send(message_parts[i], message_sizes[i]);
+      send(message_parts[i], message_sizes[i], timeout);
     }
   }
 
@@ -66,7 +70,7 @@ public:
 
 protected:
   // send_ is the heart of the interface
-  virtual void send_(const char* message, int N) = 0;
+  virtual void send_(const char* message, int N, const duration_type& timeout) = 0;
 };
 
 } // namespace dunedaq::ipm
