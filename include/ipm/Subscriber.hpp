@@ -10,12 +10,25 @@
  * received with this code.
  */
 
-namespace dunedaq {
+#include "ipm/ipmReceiver.hpp"
 
-namespace ipm {
-class Subscriber
-{};
-} // namespace ipm
-} // namespace dunedaq
+#include <vector>
+
+namespace dunedaq::ipm {
+
+  class Subscriber : public ipmReceiver
+  {
+  public:
+    bool can_receive() const noexcept override { return false; }
+
+    void reset_topics(const std::string& topics) {};
+    std::string get_topics() const {};
+    void add_topic(const std::string& topic) {};
+    void remove_topic(const std::string& topic) {};
+
+  protected:
+    std::vector<char> receive_(const duration_type& /* timeout */ ) override {}    
+  };
+} // namespace dunedaq::ipm
 
 #endif // IPM_INCLUDE_IPM_SUBSCRIBER_HPP_

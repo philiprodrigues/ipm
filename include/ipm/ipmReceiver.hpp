@@ -22,9 +22,9 @@
 #ifndef IPM_INCLUDE_IPM_IPMRECEIVER_HPP_
 #define IPM_INCLUDE_IPM_IPMRECEIVER_HPP_
 
-#include <vector>
-
 #include "ers/Issue.h"
+
+#include <vector>
 
 namespace dunedaq {
 ERS_DECLARE_ISSUE(ipm, KnownStateForbidsReceive, "Receiver not in a state to send data", )
