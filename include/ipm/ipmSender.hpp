@@ -46,6 +46,8 @@ public:
   static constexpr duration_type block = std::chrono::duration_values<duration_type>::max();
   static constexpr duration_type noblock = std::chrono::duration_values<duration_type>::zero();
 
+  using size_type = int;
+
   ipmSender() = default;
 
   virtual bool can_send() const noexcept = 0;
@@ -55,9 +57,9 @@ public:
   // -Throws NullPointerPassedToSend if message is a null pointer
   // -If message_size == 0, function is a no-op
 
-  void send(const char* message, int message_size, const duration_type& timeout);
+  void send(const char* message, size_type message_size, const duration_type& timeout);
 
-  void send_multipart(const char** message_parts, const std::vector<int>& message_sizes, const duration_type& timeout)
+  void send_multipart(const char** message_parts, const std::vector<size_type>& message_sizes, const duration_type& timeout)
   {
 
     for (size_t i = 0; i < message_sizes.size(); ++i) {
@@ -72,11 +74,11 @@ public:
   ipmSender& operator=(ipmSender&&) = delete;
 
 protected:
-  virtual void send_(const char* message, int N, const duration_type& timeout) = 0;
+  virtual void send_(const char* message, size_type N, const duration_type& timeout) = 0;
 };
 
 inline void
-ipmSender::send(const char* message, int message_size, const duration_type& timeout)
+ipmSender::send(const char* message, size_type message_size, const duration_type& timeout)
 {
   if (message_size == 0) {
     return;
