@@ -51,25 +51,12 @@ public:
 
   virtual bool can_receive() const noexcept = 0;
 
-  std::vector<char> receive(const duration_type& timeout) {
-    return receive(timeout, anysize);
-  }
+  // receive() will perform some universally-desirable checks before calling user-implemented receive_:
+  // -Throws KnownStateForbidsReceive if can_receive() == false
+  // -Throws UnexpectedNumberOfBytes if the "nbytes" argument isn't anysize, and the
+  //  received bytes inside the function aren't the same number as nbytes
 
-  std::vector<char> receive(const duration_type& timeout, size_type bytes) {
-    if (!can_receive()) {
-      throw KnownStateForbidsReceive(ERS_HERE);
-    }
-    std::vector<char> message = receive_(timeout);
-
-    if (bytes != anysize) {
-      auto received_size = static_cast<size_type>(message.size());
-      if (received_size != bytes) {
-	throw UnexpectedNumberOfBytes(ERS_HERE, received_size, bytes);
-      }
-    }
-
-    return message;
-  }
+  std::vector<char> receive(const duration_type& timeout, size_type nbytes = anysize);
 
   // Is it worth also implementing a receive_multipart where you tell
   // the function the various sizes of each message you expect?
@@ -92,6 +79,25 @@ public:
 protected:
   virtual std::vector<char> receive_(const duration_type& timeout) = 0;
 };
+
+
+inline
+std::vector<char> ipmReceiver::receive(const duration_type& timeout, size_type bytes) {
+  if (!can_receive()) {
+    throw KnownStateForbidsReceive(ERS_HERE);
+  }
+  std::vector<char> message = receive_(timeout);
+
+  if (bytes != anysize) {
+    auto received_size = static_cast<size_type>(message.size());
+    if (received_size != bytes) {
+      throw UnexpectedNumberOfBytes(ERS_HERE, received_size, bytes);
+    }
+  }
+
+  return message;
+}
+
 
 } // namespace dunedaq::ipm
 

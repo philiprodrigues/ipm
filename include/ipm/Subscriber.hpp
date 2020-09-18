@@ -21,13 +21,13 @@ namespace dunedaq::ipm {
   public:
     bool can_receive() const noexcept override { return false; }
 
-    void reset_topics(const std::string& topics) {};
-    std::string get_topics() const {};
-    void add_topic(const std::string& topic) {};
-    void remove_topic(const std::string& topic) {};
+    void reset_topics(const std::string& /* topics */) {};
+    std::string get_topics() const { return "If you can see this, Subscriber::get_topics is not implemented"; };
+    void add_topic(const std::string& /* topic */ ) {};
+    void remove_topic(const std::string& /* topic */) {};
 
   protected:
-    std::vector<char> receive_(const duration_type& /* timeout */ ) override {}    
+    std::vector<char> receive_(const duration_type& /* timeout */ ) override { return std::vector<char>(); }    
   };
 } // namespace dunedaq::ipm
 

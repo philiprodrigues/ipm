@@ -49,23 +49,12 @@ public:
 
   virtual bool can_send() const noexcept = 0;
 
-  // send() will call some universally-desirable checks before calling user-implemented send_()
-  void send(const char* message, int message_size, const duration_type& timeout)
-  {
-    if (message_size == 0) {
-      return;
-    }
+  // send() will perform some universally-desirable checks before calling user-implemented send_()
+  // -Throws KnownStateForbidsSend if can_send() == false
+  // -Throws NullPointerPassedToSend if message is a null pointer
+  // -If message_size == 0, function is a no-op
 
-    if (!can_send()) {
-      throw KnownStateForbidsSend(ERS_HERE);
-    }
-
-    if (!message) {
-      throw NullPointerPassedToSend(ERS_HERE);
-    }
-
-    send_(message, message_size, timeout);
-  }
+  void send(const char* message, int message_size, const duration_type& timeout);
 
   void send_multipart(const char** message_parts, const std::vector<int>& message_sizes, const duration_type& timeout)
   {
@@ -84,6 +73,25 @@ public:
 protected:
   virtual void send_(const char* message, int N, const duration_type& timeout) = 0;
 };
+
+inline 
+void ipmSender::send(const char* message, int message_size, const duration_type& timeout)
+{
+  if (message_size == 0) {
+    return;
+  }
+
+  if (!can_send()) {
+    throw KnownStateForbidsSend(ERS_HERE);
+  }
+
+  if (!message) {
+    throw NullPointerPassedToSend(ERS_HERE);
+  }
+
+  send_(message, message_size, timeout);
+}
+
 
 } // namespace dunedaq::ipm
 
