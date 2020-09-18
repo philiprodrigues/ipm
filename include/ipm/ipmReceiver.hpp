@@ -28,9 +28,14 @@
 
 namespace dunedaq {
 ERS_DECLARE_ISSUE(ipm, KnownStateForbidsReceive, "Receiver not in a state to send data", )
-ERS_DECLARE_ISSUE(ipm, UnexpectedNumberOfBytes, "Expected " << bytes1 << " bytes in message but received " << bytes2, ((int)bytes1)((int)bytes2))
-ERS_DECLARE_ISSUE(ipm, ReceiveTimeoutExpired, "Unable to receive within timeout period (timeout period was " << timeout
-		  << " milliseconds)", ((int)timeout))
+ERS_DECLARE_ISSUE(ipm,
+                  UnexpectedNumberOfBytes,
+                  "Expected " << bytes1 << " bytes in message but received " << bytes2,
+                  ((int)bytes1)((int)bytes2)) // NOLINT
+ERS_DECLARE_ISSUE(ipm,
+                  ReceiveTimeoutExpired,
+                  "Unable to receive within timeout period (timeout period was " << timeout << " milliseconds)",
+                  ((int)timeout)) // NOLINT
 } // namespace dunedaq
 
 namespace dunedaq::ipm {
@@ -39,13 +44,13 @@ class ipmReceiver
 {
 
 public:
-
-  using duration_type = std::chrono::milliseconds; 
-  static constexpr duration_type block =   std::chrono::duration_values<duration_type>::max();
+  using duration_type = std::chrono::milliseconds;
+  static constexpr duration_type block = std::chrono::duration_values<duration_type>::max();
   static constexpr duration_type noblock = std::chrono::duration_values<duration_type>::zero();
 
   using size_type = int;
-  static constexpr size_type anysize = 0; // Since "I want 0 bytes" is pointless, "0" denotes "I don't care about the size" 
+  static constexpr size_type anysize =
+    0; // Since "I want 0 bytes" is pointless, "0" denotes "I don't care about the size"
 
   ipmReceiver() = default;
 
@@ -61,11 +66,12 @@ public:
   // Is it worth also implementing a receive_multipart where you tell
   // the function the various sizes of each message you expect?
 
-  std::vector<std::vector<char>> receive_multipart(const duration_type& timeout_per_message, size_type n_messages) {
+  std::vector<std::vector<char>> receive_multipart(const duration_type& timeout_per_message, size_type n_messages)
+  {
     std::vector<std::vector<char>> messages;
 
     for (size_type i_message = 0; i_message < n_messages; ++i_message) {
-      messages.emplace_back( receive(timeout_per_message) );
+      messages.emplace_back(receive(timeout_per_message));
     }
     return messages;
   }
@@ -80,9 +86,9 @@ protected:
   virtual std::vector<char> receive_(const duration_type& timeout) = 0;
 };
 
-
-inline
-std::vector<char> ipmReceiver::receive(const duration_type& timeout, size_type bytes) {
+inline std::vector<char>
+ipmReceiver::receive(const duration_type& timeout, size_type bytes)
+{
   if (!can_receive()) {
     throw KnownStateForbidsReceive(ERS_HERE);
   }
@@ -97,7 +103,6 @@ std::vector<char> ipmReceiver::receive(const duration_type& timeout, size_type b
 
   return message;
 }
-
 
 } // namespace dunedaq::ipm
 

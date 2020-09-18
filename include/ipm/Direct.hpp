@@ -10,25 +10,24 @@
  * received with this code.
  */
 
-#include "ipm/ipmSender.hpp"
 #include "ipm/ipmReceiver.hpp"
+#include "ipm/ipmSender.hpp"
 
 #include <vector>
 
 namespace dunedaq::ipm {
-  class Direct : public ipmSender, public ipmReceiver
-  {
-  public:
-    bool can_send() const noexcept override { return false; }
-    bool can_receive() const noexcept override { return false; }
+class Direct
+  : public ipmSender
+  , public ipmReceiver
+{
+public:
+  bool can_send() const noexcept override { return false; }
+  bool can_receive() const noexcept override { return false; }
 
-  protected:
-    void send_(const char* /* message */, int /* N */, const ipmSender::duration_type& /* timeout */) override {}
-    std::vector<char> receive_(const ipmReceiver::duration_type& /* timeout */ ) override {
-      return std::vector<char>();
-    }
-  };
+protected:
+  void send_(const char* /* message */, int /* N */, const ipmSender::duration_type& /* timeout */) override {}
+  std::vector<char> receive_(const ipmReceiver::duration_type& /* timeout */) override { return std::vector<char>(); }
+};
 } // namespace dunedaq::ipm
-
 
 #endif // IPM_INCLUDE_IPM_DIRECT_HPP_

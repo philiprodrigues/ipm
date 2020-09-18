@@ -13,15 +13,14 @@
 #include "ipm/ipmSender.hpp"
 
 namespace dunedaq::ipm {
-  class Publisher : public ipmSender
-  {
-  public:
-    bool can_send() const noexcept override { return false; }
+class Publisher : public ipmSender
+{
+public:
+  bool can_send() const noexcept override { return false; }
 
-  protected:
-    void send_(const char* /* message */, int /* N */, const duration_type& /* timeout */) override {}
-  };
+protected:
+  void send_(const char* /* message */, int /* N */, const duration_type& /* timeout */) override {}
+};
 } // namespace dunedaq::ipm
-
 
 #endif // IPM_INCLUDE_IPM_PUBLISHER_HPP_

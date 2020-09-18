@@ -22,15 +22,17 @@
 #ifndef IPM_INCLUDE_IPM_IPMSENDER_HPP_
 #define IPM_INCLUDE_IPM_IPMSENDER_HPP_
 
-#include <string>
-
 #include "ers/Issue.h"
+#include <string>
+#include <vector>
 
 namespace dunedaq {
 ERS_DECLARE_ISSUE(ipm, KnownStateForbidsSend, "Sender not in a state to send data", )
 ERS_DECLARE_ISSUE(ipm, NullPointerPassedToSend, "An null pointer to memory was passed to ipmSender::send", )
-ERS_DECLARE_ISSUE(ipm, SendTimeoutExpired, "Unable to send within timeout period (timeout period was " << timeout
-		  << " milliseconds)", ((int)timeout))
+ERS_DECLARE_ISSUE(ipm,
+                  SendTimeoutExpired,
+                  "Unable to send within timeout period (timeout period was " << timeout << " milliseconds)",
+                  ((int)timeout)) // NOLINT
 
 } // namespace dunedaq
 
@@ -40,11 +42,10 @@ class ipmSender
 {
 
 public:
-
-  using duration_type = std::chrono::milliseconds; 
-  static constexpr duration_type block =   std::chrono::duration_values<duration_type>::max();
+  using duration_type = std::chrono::milliseconds;
+  static constexpr duration_type block = std::chrono::duration_values<duration_type>::max();
   static constexpr duration_type noblock = std::chrono::duration_values<duration_type>::zero();
-  
+
   ipmSender() = default;
 
   virtual bool can_send() const noexcept = 0;
@@ -74,8 +75,8 @@ protected:
   virtual void send_(const char* message, int N, const duration_type& timeout) = 0;
 };
 
-inline 
-void ipmSender::send(const char* message, int message_size, const duration_type& timeout)
+inline void
+ipmSender::send(const char* message, int message_size, const duration_type& timeout)
 {
   if (message_size == 0) {
     return;
@@ -91,7 +92,6 @@ void ipmSender::send(const char* message, int message_size, const duration_type&
 
   send_(message, message_size, timeout);
 }
-
 
 } // namespace dunedaq::ipm
 
