@@ -1,10 +1,6 @@
 /**
  * @file ipmSender_test.cxx ipmSender class Unit Tests
  *
- * This file is meant to serve as an example for developers for how to use Boost
- * to write unit tests for their package's components. It's good practice to write
- * unit tests and make sure they pass before passing code on to others.
- *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.

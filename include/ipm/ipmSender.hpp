@@ -9,6 +9,11 @@
  * - Implement the protected virtual send_ function, called by public non-virtual send
  * - Implement the public virtual can_send function
  *
+ * And is encouraged to:
+ *
+ * - Meaningfully implement the timeout feature in send_, and have it
+ *   throw the SendTimeoutExpired exception if it occurs
+ *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
@@ -24,6 +29,9 @@
 namespace dunedaq {
 ERS_DECLARE_ISSUE(ipm, KnownStateForbidsSend, "Sender not in a state to send data", )
 ERS_DECLARE_ISSUE(ipm, NullPointerPassedToSend, "An null pointer to memory was passed to ipmSender::send", )
+ERS_DECLARE_ISSUE(ipm, SendTimeoutExpired, "Unable to send within timeout period (timeout period was " << timeout
+		  << " milliseconds)", ((int)timeout))
+
 } // namespace dunedaq
 
 namespace dunedaq::ipm {
@@ -41,8 +49,13 @@ public:
 
   virtual bool can_send() const noexcept = 0;
 
+  // send() will call some universally-desirable checks before calling user-implemented send_()
   void send(const char* message, int message_size, const duration_type& timeout)
   {
+    if (message_size == 0) {
+      return;
+    }
+
     if (!can_send()) {
       throw KnownStateForbidsSend(ERS_HERE);
     }
@@ -54,7 +67,7 @@ public:
     send_(message, message_size, timeout);
   }
 
-  void send(const char** message_parts, const std::vector<int>& message_sizes, const duration_type& timeout)
+  void send_multipart(const char** message_parts, const std::vector<int>& message_sizes, const duration_type& timeout)
   {
 
     for (size_t i = 0; i < message_sizes.size(); ++i) {
@@ -69,7 +82,6 @@ public:
   ipmSender& operator=(ipmSender&&) = delete;
 
 protected:
-  // send_ is the heart of the interface
   virtual void send_(const char* message, int N, const duration_type& timeout) = 0;
 };
 
