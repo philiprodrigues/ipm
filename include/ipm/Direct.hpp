@@ -25,7 +25,7 @@ public:
   bool can_receive() const noexcept override { return false; }
 
 protected:
-  void send_(const char* /* message */, int /* N */, const ipmSender::duration_type& /* timeout */) override {}
+  void send_(const void* /* message */, int /* N */, const ipmSender::duration_type& /* timeout */) override {}
   std::vector<char> receive_(const ipmReceiver::duration_type& /* timeout */) override { return std::vector<char>(); }
 };
 } // namespace dunedaq::ipm

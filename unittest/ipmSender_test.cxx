@@ -33,7 +33,7 @@ public:
   void sabotage_my_sending_ability() { can_send_ = false; }
 
 protected:
-  void send_(const char* /* message */, int /* N */, const duration_type& /* timeout */) override
+  void send_(const void* /* message */, int /* N */, const duration_type& /* timeout */) override
   {
     // Pretty unexciting stub
   }

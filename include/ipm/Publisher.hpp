@@ -19,7 +19,7 @@ public:
   bool can_send() const noexcept override { return false; }
 
 protected:
-  void send_(const char* /* message */, int /* N */, const duration_type& /* timeout */) override {}
+  void send_(const void* /* message */, int /* N */, const duration_type& /* timeout */) override {}
 };
 } // namespace dunedaq::ipm
 
