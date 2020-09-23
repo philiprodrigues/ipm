@@ -7,6 +7,7 @@ include(DAQ)
 daq_setup_environment()
 
 find_package(appfwk REQUIRED)
+find_package(cppzmq REQUIRED)
 
 ##############################################################################
 daq_point_build_to( include )  
@@ -15,8 +16,8 @@ daq_point_build_to( include )
 ##############################################################################
 daq_point_build_to( src )
 
-add_library(IPM src/Direct.cpp src/Publisher.cpp src/Subscriber.cpp)
-target_link_libraries(IPM appfwk::appfwk)
+add_library(IPM src/Direct.cpp src/Publisher.cpp src/Subscriber.cpp src/ZmqSender.cpp src/ZmqReceiver.cpp)
+target_link_libraries(IPM appfwk::appfwk ${ZMQ})
 
 ##############################################################################
 daq_point_build_to( test )
@@ -34,5 +35,7 @@ daq_add_unit_test(ipmReceiver_test IPM )
 daq_add_unit_test(Direct_test    IPM )
 daq_add_unit_test(Publisher_test    IPM )
 daq_add_unit_test(Subscriber_test    IPM )
+daq_add_unit_test(ZmqReceiver_test IPM)
+daq_add_unit_test(ZmqSender_test IPM)
 
 daq_install(TARGETS IPM)
