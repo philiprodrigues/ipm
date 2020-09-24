@@ -21,6 +21,8 @@ class Direct
   , public ipmReceiver
 {
 public:
+  virtual void connect_for_sends(const nlohmann::json& /* connection_info */) override {}
+  virtual void connect_for_receives(const nlohmann::json& /* connection info */) override {}
   bool can_send() const noexcept override { return false; }
   bool can_receive() const noexcept override { return false; }
 

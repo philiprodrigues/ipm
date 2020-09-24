@@ -30,6 +30,7 @@ public:
     : can_receive_(false)
   {}
 
+  void connect_for_receives(const nlohmann::json& /* connection_info */) {};
   bool can_receive() const noexcept override { return can_receive_; }
   void make_me_ready_to_receive() { can_receive_ = true; }
   void sabotage_my_receiving_ability() { can_receive_ = false; }

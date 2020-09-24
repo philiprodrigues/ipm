@@ -20,6 +20,7 @@ namespace dunedaq::ipm {
 class Subscriber : public ipmReceiver
 {
 public:
+  void connect_for_receives(const nlohmann::json& /* connection info */) override {}
   bool can_receive() const noexcept override { return false; }
 
   void reset_topics(const std::string& /* topics */) {}
