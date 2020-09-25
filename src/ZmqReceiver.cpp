@@ -7,34 +7,30 @@
  * received with this code.
  */
 
-#include "ipm/ZmqContext.hpp"
-#include "ipm/ipmReceiver.hpp"
+#include "ipm/ZmqReceiver.hpp"
 
+#include "TRACE/trace.h"
+#define TRACE_NAME "ZmqReceiver"
 #include <zmq.hpp>
 #include <vector>
+#include <string>
 
 namespace dunedaq {
 namespace ipm {
-class ZmqReceiver : public ipmReceiver
-{
-public:
-  ZmqReceiver()
-    : socket_(ZmqContext::instance().GetContext(), zmq::socket_type::pull)
-  {}
-  bool can_receive() const noexcept override;
-
-protected:
-  std::vector<char> receive_(const duration_type& timeout) override;
-
-private:
-  zmq::socket_t socket_;
-  bool socket_connected_{ false };
-};
 
 bool
 ZmqReceiver::can_receive() const noexcept
 {
   return socket_connected_;
+}
+
+void
+ZmqReceiver::connect_for_receives(const nlohmann::json& connection_info)
+{
+  std::string connection_string = connection_info.value<std::string>("connection_string", "inproc://default");
+  TLOG(TLVL_INFO) << "Connection String is " << connection_string;
+  socket_.bind(connection_string);
+  socket_connected_ = true;
 }
 
 std::vector<char>

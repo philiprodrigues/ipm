@@ -24,10 +24,15 @@ target_link_libraries(IPM appfwk::appfwk ${ZMQ})
 ##############################################################################
 daq_point_build_to( test )
 
-add_library(IPMReceiver_duneDAQModule test/IPMReceiver_duneDAQModule.cpp)
-target_link_libraries(IPMReceiver_duneDAQModule appfwk::appfwk)
-add_library(IPMSender_duneDAQModule test/IPMSender_duneDAQModule.cpp)
-target_link_libraries(IPMSender_duneDAQModule appfwk::appfwk)
+add_library(ipm_VectorIntIPMSender_duneDAQModule test/VectorIntIPMSenderDAQModule.cpp)
+target_link_libraries(ipm_VectorIntIPMSender_duneDAQModule IPM)
+
+add_library(ipm_VectorIntIPMReceiver_duneDAQModule test/VectorIntIPMReceiverDAQModule.cpp)
+target_link_libraries(ipm_VectorIntIPMReceiver_duneDAQModule IPM)
+
+file(COPY test/singleProcess.json DESTINATION test)
+file(COPY test/simpleZmqSender.json DESTINATION test)
+file(COPY test/simpleZmqReceiver.json DESTINATION test)
 
 ##############################################################################
 daq_point_build_to( unittest )

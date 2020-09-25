@@ -7,33 +7,28 @@
  * received with this code.
  */
 
-#include "ipm/ipmSender.hpp"
-#include "ipm/ZmqContext.hpp"
+#include "ipm/ZmqSender.hpp"
 
-#include <zmq.hpp>
+#include "TRACE/trace.h"
+#define TRACE_NAME "ZmqSender"
+#include <string>
 
 namespace dunedaq {
 namespace ipm {
-class ZmqSender : public ipmSender
-{
-public:
-  ZmqSender()
-    : socket_(ZmqContext::instance().GetContext(), zmq::socket_type::push)
-  {}
-  bool can_send() const noexcept override;
-
-protected:
-  void send_(const void* message, int N, const duration_type& timeout) override;
-
-private:
-  zmq::socket_t socket_;
-  bool socket_connected_;
-};
 
 bool
 ZmqSender::can_send() const noexcept
 {
   return socket_connected_;
+}
+
+void
+ZmqSender::connect_for_sends(const nlohmann::json& connection_info)
+{
+  std::string connection_string = connection_info.value<std::string>("connection_string", "inproc://default");
+  TLOG(TLVL_INFO) << "Connection String is " << connection_string;
+  socket_.connect(connection_string);
+  socket_connected_ = true;
 }
 
 void
