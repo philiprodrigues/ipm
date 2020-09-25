@@ -8,6 +8,8 @@ daq_setup_environment()
 
 find_package(appfwk REQUIRED)
 find_package(cppzmq REQUIRED)
+find_package(ers REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 ##############################################################################
 daq_point_build_to( include )  

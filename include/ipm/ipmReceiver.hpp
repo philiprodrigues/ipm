@@ -8,6 +8,7 @@
  *
  * - Implement the protected virtual receive_ function, called by public non-virtual receive
  * - Implement the public virtual can_receive function
+ * - Implement the public virtual connect_for_receives function  
  *
  * And is encouraged to:
  *
@@ -23,6 +24,7 @@
 #define IPM_INCLUDE_IPM_IPMRECEIVER_HPP_
 
 #include "ers/Issue.h"
+#include "nlohmann/json.hpp"
 
 #include <vector>
 
@@ -53,6 +55,8 @@ public:
     0; // Since "I want 0 bytes" is pointless, "0" denotes "I don't care about the size"
 
   ipmReceiver() = default;
+
+  virtual void connect_for_receives(const nlohmann::json& connection_info) = 0; 
 
   virtual bool can_receive() const noexcept = 0;
 

@@ -16,6 +16,7 @@ namespace dunedaq::ipm {
 class Publisher : public ipmSender
 {
 public:
+  virtual void connect_for_sends(const nlohmann::json& /* connection_info */) override {}
   bool can_send() const noexcept override { return false; }
 
 protected:

@@ -8,6 +8,7 @@
  *
  * - Implement the protected virtual send_ function, called by public non-virtual send
  * - Implement the public virtual can_send function
+ * - Implement the public virtual connect_for_sends function
  *
  * And is encouraged to:
  *
@@ -23,6 +24,8 @@
 #define IPM_INCLUDE_IPM_IPMSENDER_HPP_
 
 #include "ers/Issue.h"
+#include "nlohmann/json.hpp"
+
 #include <string>
 #include <vector>
 
@@ -49,6 +52,8 @@ public:
   using size_type = int;
 
   ipmSender() = default;
+
+  virtual void connect_for_sends(const nlohmann::json& connection_info) = 0; 
 
   virtual bool can_send() const noexcept = 0;
 
