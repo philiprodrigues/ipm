@@ -28,7 +28,7 @@ public:
     : can_send_(false)
   {}
 
-  void connect_for_sends(const nlohmann::json& /* connection_info */) {};
+  void connect_for_sends(const nlohmann::json& /* connection_info */) {}
   bool can_send() const noexcept override { return can_send_; }
   void make_me_ready_to_send() { can_send_ = true; }
   void sabotage_my_sending_ability() { can_send_ = false; }
