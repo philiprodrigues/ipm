@@ -7,6 +7,8 @@ include(DAQ)
 daq_setup_environment()
 
 find_package(appfwk REQUIRED)
+
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake ${CMAKE_MODULE_PATH})
 find_package(cppzmq REQUIRED)
 find_package(ers REQUIRED)
 find_package(nlohmann_json REQUIRED)
