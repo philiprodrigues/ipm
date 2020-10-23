@@ -16,6 +16,8 @@
 #include "appfwk/ThreadHelper.hpp"
 #include "ipm/ipmReceiver.hpp"
 
+#include "ipm/viir/Structs.hpp"
+
 #include <future>
 #include <memory>
 #include <string>
@@ -45,25 +47,25 @@ public:
   VectorIntIPMReceiverDAQModule& operator=(VectorIntIPMReceiverDAQModule&&) =
     delete; ///< VectorIntIPMReceiverDAQModule is not move-assignable
 
-  void init() override;
+  void init(const data_t& ) override;
 
 private:
   // Commands
-  void do_configure(const std::vector<std::string>& args);
-  void do_start(const std::vector<std::string>& args);
-  void do_stop(const std::vector<std::string>& args);
+  void do_configure(const data_t& );
+  void do_start(const data_t& );
+  void do_stop(const data_t& );
 
   // Threading
   appfwk::ThreadHelper thread_;
   void do_work(std::atomic<bool>& running_flag);
 
   // Configuration
+  viir::Conf cfg_;
   std::unique_ptr<ipmReceiver> input_;
   std::unique_ptr<appfwk::DAQSink<std::vector<int>>> outputQueue_;
   std::chrono::milliseconds queueTimeout_;
   size_t nIntsPerVector_ = 999;
 
-  size_t wait_between_sends_ms_ = 999;
 };
 } // namespace ipm
 

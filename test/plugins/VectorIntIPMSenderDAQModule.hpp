@@ -17,6 +17,8 @@
 #include "appfwk/ThreadHelper.hpp"
 #include "ipm/ipmSender.hpp"
 
+#include "ipm/viis/Structs.hpp"
+
 #include <ers/Issue.h>
 
 #include <future>
@@ -48,19 +50,21 @@ public:
   VectorIntIPMSenderDAQModule& operator=(VectorIntIPMSenderDAQModule&&) =
     delete; ///< VectorIntIPMSenderDAQModule is not move-assignable
 
-  void init() override;
+  void init(const data_t& ) override;
 
 private:
   // Commands
-  void do_configure(const std::vector<std::string>& args);
-  void do_start(const std::vector<std::string>& args);
-  void do_stop(const std::vector<std::string>& args);
+  void do_configure(const data_t& );
+  void do_start(const data_t& );
+  void do_stop(const data_t& );
 
   // Threading
   void do_work(std::atomic<bool>& running_flag);
   appfwk::ThreadHelper thread_;
 
   // Configuration (for validation)
+
+  viis::Conf cfg_;
   size_t nIntsPerVector_ = 999;
   std::chrono::milliseconds queueTimeout_;
   std::unique_ptr<appfwk::DAQSource<std::vector<int>>> inputQueue_;

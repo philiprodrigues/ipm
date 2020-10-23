@@ -8,8 +8,10 @@
  */
 
 #include "VectorIntIPMSenderDAQModule.hpp"
-
 #include "ipm/ZmqSender.hpp"
+
+#include "appfwk/cmd/Nljs.hpp"
+#include "ipm/viis/Nljs.hpp"
 
 #include "TRACE/trace.h"
 #include <ers/ers.h>
@@ -40,33 +42,49 @@ VectorIntIPMSenderDAQModule::VectorIntIPMSenderDAQModule(const std::string& name
 }
 
 void
-VectorIntIPMSenderDAQModule::init()
+VectorIntIPMSenderDAQModule::init(const data_t& init_data)
 {
-  inputQueue_.reset(new appfwk::DAQSource<std::vector<int>>(get_config()["input"].get<std::string>()));
-  std::string sender_type = get_config().value<std::string>("sender_type", "Zmq");
+  std::string sender_type = "Zmq";
+
+  auto ini = init_data.get<appfwk::cmd::ModInit>();
+  for (const auto& qi : ini.qinfos) {
+    if (qi.name == "input") {
+      ERS_INFO("VIISDM: input queue is " << qi.inst);
+      inputQueue_.reset(new appfwk::DAQSource<std::vector<int>>(qi.inst));
+    }
+
+    if (qi.name == "sender_type") {
+      sender_type = qi.inst;
+    }
+  }
 
   if (sender_type == "Zmq") {
     output_.reset(new ZmqSender());
   }
+
+  // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
+  // In the next week, determine what to do if sender_type isn't known
 }
 
 void
-VectorIntIPMSenderDAQModule::do_configure(const std::vector<std::string>& /*args*/)
+VectorIntIPMSenderDAQModule::do_configure(const data_t& config_data)
 {
+cfg_ = config_data.get<viis::Conf>();
 
-  nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
-  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
-  output_->connect_for_sends(get_config());
+  nIntsPerVector_ = cfg_.nIntsPerVector;
+  queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
+
+  output_->connect_for_sends(config_data);
 }
 
 void
-VectorIntIPMSenderDAQModule::do_start(const std::vector<std::string>& /*args*/)
+VectorIntIPMSenderDAQModule::do_start(const data_t& /*args*/)
 {
   thread_.start_working_thread();
 }
 
 void
-VectorIntIPMSenderDAQModule::do_stop(const std::vector<std::string>& /*args*/)
+VectorIntIPMSenderDAQModule::do_stop(const data_t& /*args*/)
 {
   thread_.stop_working_thread();
 }

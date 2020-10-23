@@ -9,6 +9,8 @@
 
 #include "VectorIntIPMReceiverDAQModule.hpp"
 
+#include "appfwk/cmd/Nljs.hpp"
+#include "ipm/viir/Nljs.hpp"
 #include "ipm/ZmqReceiver.hpp"
 
 #include <chrono>
@@ -30,7 +32,6 @@ VectorIntIPMReceiverDAQModule::VectorIntIPMReceiverDAQModule(const std::string& 
   : appfwk::DAQModule(name)
   , thread_(std::bind(&VectorIntIPMReceiverDAQModule::do_work, this, std::placeholders::_1))
   , outputQueue_(nullptr)
-  , queueTimeout_(100)
 {
 
   register_command("configure", &VectorIntIPMReceiverDAQModule::do_configure);
@@ -39,32 +40,49 @@ VectorIntIPMReceiverDAQModule::VectorIntIPMReceiverDAQModule(const std::string& 
 }
 
 void
-VectorIntIPMReceiverDAQModule::init()
+VectorIntIPMReceiverDAQModule::init(const data_t& init_data)
 {
-  outputQueue_.reset(new appfwk::DAQSink<std::vector<int>>(get_config()["output"].get<std::string>()));
-  std::string receiver_type = get_config().value<std::string>("receiver_type", "Zmq");
+
+  std::string receiver_type = "Zmq";
+
+  auto ini = init_data.get<appfwk::cmd::ModInit>();
+  for (const auto& qi : ini.qinfos) {
+    if (qi.name == "output") {
+      ERS_INFO("VIIRDM: output queue is " << qi.inst);
+      outputQueue_.reset(new appfwk::DAQSink<std::vector<int>>(qi.inst));
+    }
+
+    if (qi.name == "receiver_type") {
+      receiver_type = qi.inst;
+    }
+  }
   
   if (receiver_type == "Zmq") {
       input_.reset(new ZmqReceiver());
-  }
+  } 
+  // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
+  // In the next week, determine what to do if receiver_type isn't known
 }
 
 void
-VectorIntIPMReceiverDAQModule::do_configure(const std::vector<std::string>& /*args*/)
+VectorIntIPMReceiverDAQModule::do_configure(const data_t& config_data)
 {
-  nIntsPerVector_ = get_config().value<int>("nIntsPerVector", 10);
-  queueTimeout_ = std::chrono::milliseconds(get_config().value<int>("queue_timeout_ms", 100));
-  input_->connect_for_receives(get_config());
+  cfg_ = config_data.get<viir::Conf>();
+
+  nIntsPerVector_ = cfg_.nIntsPerVector;
+  queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
+
+  input_->connect_for_receives(cfg_);
 }
 
 void
-VectorIntIPMReceiverDAQModule::do_start(const std::vector<std::string>& /*args*/)
+VectorIntIPMReceiverDAQModule::do_start(const data_t& /*args*/)
 {
   thread_.start_working_thread();
 }
 
 void
-VectorIntIPMReceiverDAQModule::do_stop(const std::vector<std::string>& /*args*/)
+VectorIntIPMReceiverDAQModule::do_stop(const data_t& /*args*/)
 {
   thread_.stop_working_thread();
 }
