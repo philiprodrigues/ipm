@@ -12,6 +12,7 @@
 #include "appfwk/cmd/Nljs.hpp"
 #include "ipm/viir/Nljs.hpp"
 #include "ipm/ZmqReceiver.hpp"
+#include "ipm/ZmqSubscriber.hpp"
 
 #include <chrono>
 #include <string>
@@ -43,7 +44,8 @@ void
 VectorIntIPMReceiverDAQModule::init(const data_t& init_data)
 {
 
-  std::string receiver_type = "Zmq";
+  std::string receiver_type = "ZmqSocket";
+  std::string topic = "VectorIntTopic";
 
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
@@ -55,11 +57,17 @@ VectorIntIPMReceiverDAQModule::init(const data_t& init_data)
     if (qi.name == "receiver_type") {
       receiver_type = qi.inst;
     }
+
+    if (qi.name == "topic") {
+      topic = qi.inst;
+    }
   }
   
-  if (receiver_type == "Zmq") {
+  if (receiver_type == "ZmqSocket") {
       input_.reset(new ZmqReceiver());
-  } 
+  } else if (receiver_type == "ZmqPubSub") {
+    input_.reset(new ZmqSubscriber(topic));
+  }
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
   // In the next week, determine what to do if receiver_type isn't known
 }

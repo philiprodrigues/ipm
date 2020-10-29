@@ -9,6 +9,7 @@
 
 #include "VectorIntIPMSenderDAQModule.hpp"
 #include "ipm/ZmqSender.hpp"
+#include "ipm/ZmqPublisher.hpp"
 
 #include "appfwk/cmd/Nljs.hpp"
 #include "ipm/viis/Nljs.hpp"
@@ -44,7 +45,8 @@ VectorIntIPMSenderDAQModule::VectorIntIPMSenderDAQModule(const std::string& name
 void
 VectorIntIPMSenderDAQModule::init(const data_t& init_data)
 {
-  std::string sender_type = "Zmq";
+  std::string sender_type = "ZmqSocket";
+  std::string topic = "VectorIntTopic";
 
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
@@ -56,10 +58,16 @@ VectorIntIPMSenderDAQModule::init(const data_t& init_data)
     if (qi.name == "sender_type") {
       sender_type = qi.inst;
     }
+
+    if (qi.name == "topic") {
+      topic = qi.inst;
+    }
   }
 
-  if (sender_type == "Zmq") {
+  if (sender_type == "ZmqSocket") {
     output_.reset(new ZmqSender());
+  } else if (sender_type == "ZmqPubSub") {
+    output_.reset(new ZmqPublisher(topic));
   }
 
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
