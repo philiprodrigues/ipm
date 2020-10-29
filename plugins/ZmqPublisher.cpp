@@ -7,14 +7,33 @@
  * received with this code.
  */
 
-#include "ipm/ZmqPublisher.hpp"
-
 #include "TRACE/trace.h"
 #define TRACE_NAME "ZmqPublisher"
 #include <string>
 
+#include "ipm/Publisher.hpp"
+#include "ipm/ZmqContext.hpp"
+
+#include <zmq.hpp>
+
 namespace dunedaq {
 namespace ipm {
+class ZmqPublisher : public Publisher
+{
+public:
+  ZmqPublisher()
+    : socket_(ZmqContext::instance().GetContext(), zmq::socket_type::pub)
+  {}
+  bool can_send() const noexcept override;
+  void connect_for_sends(const nlohmann::json& connection_info);
+
+protected:
+  void publish_(const void* message, int N, const duration_type& timeout, std::string const& topic) override;
+
+private:
+  zmq::socket_t socket_;
+  bool socket_connected_;
+};
 
 bool
 ZmqPublisher::can_send() const noexcept
@@ -32,13 +51,15 @@ ZmqPublisher::connect_for_sends(const nlohmann::json& connection_info)
 }
 
 void
-ZmqPublisher::send_(const void* message, int N, const duration_type& )
+ZmqPublisher::publish_(const void* message, int N, const duration_type&, std::string const& topic)
 {
-  zmq::message_t topic(topic_.c_str(), topic_.size());
+  zmq::message_t topic_msg(topic.c_str(), topic.size());
   zmq::message_t msg(message, N);
-  socket_.send(topic, ZMQ_SNDMORE);
+  socket_.send(topic_msg, ZMQ_SNDMORE);
   socket_.send(msg);
 }
 
 } // namespace ipm
 } // namespace dunedaq
+
+DEFINE_DUNE_IPM_SENDER(dunedaq::ipm::ZmqPublisher)

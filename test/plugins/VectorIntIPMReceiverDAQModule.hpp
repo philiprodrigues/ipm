@@ -14,7 +14,7 @@
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/DAQSink.hpp"
 #include "appfwk/ThreadHelper.hpp"
-#include "ipm/ipmReceiver.hpp"
+#include "ipm/Receiver.hpp"
 
 #include "ipm/viir/Structs.hpp"
 
@@ -61,7 +61,7 @@ private:
 
   // Configuration
   viir::Conf cfg_;
-  std::unique_ptr<ipmReceiver> input_;
+  std::shared_ptr<Receiver> input_;
   std::unique_ptr<appfwk::DAQSink<std::vector<int>>> outputQueue_;
   std::chrono::milliseconds queueTimeout_;
   size_t nIntsPerVector_ = 999;

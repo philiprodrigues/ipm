@@ -8,8 +8,6 @@
  */
 
 #include "VectorIntIPMSenderDAQModule.hpp"
-#include "ipm/ZmqSender.hpp"
-#include "ipm/ZmqPublisher.hpp"
 
 #include "appfwk/cmd/Nljs.hpp"
 #include "ipm/viis/Nljs.hpp"
@@ -64,11 +62,7 @@ VectorIntIPMSenderDAQModule::init(const data_t& init_data)
     }
   }
 
-  if (sender_type == "ZmqSocket") {
-    output_.reset(new ZmqSender());
-  } else if (sender_type == "ZmqPubSub") {
-    output_.reset(new ZmqPublisher(topic));
-  }
+  output_ = makeIPMSender(sender_type);
 
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
   // In the next week, determine what to do if sender_type isn't known

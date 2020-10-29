@@ -15,7 +15,7 @@
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/DAQSource.hpp"
 #include "appfwk/ThreadHelper.hpp"
-#include "ipm/ipmSender.hpp"
+#include "ipm/Sender.hpp"
 
 #include "ipm/viis/Structs.hpp"
 
@@ -68,7 +68,7 @@ private:
   size_t nIntsPerVector_ = 999;
   std::chrono::milliseconds queueTimeout_;
   std::unique_ptr<appfwk::DAQSource<std::vector<int>>> inputQueue_;
-  std::unique_ptr<ipmSender> output_;
+  std::shared_ptr<Sender> output_;
 };
 
 } // namespace ipm

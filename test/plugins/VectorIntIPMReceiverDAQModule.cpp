@@ -11,8 +11,6 @@
 
 #include "appfwk/cmd/Nljs.hpp"
 #include "ipm/viir/Nljs.hpp"
-#include "ipm/ZmqReceiver.hpp"
-#include "ipm/ZmqSubscriber.hpp"
 
 #include <chrono>
 #include <string>
@@ -63,11 +61,8 @@ VectorIntIPMReceiverDAQModule::init(const data_t& init_data)
     }
   }
   
-  if (receiver_type == "ZmqSocket") {
-      input_.reset(new ZmqReceiver());
-  } else if (receiver_type == "ZmqPubSub") {
-    input_.reset(new ZmqSubscriber(topic));
-  }
+  input_ = makeIPMReceiver(receiver_type);
+
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
   // In the next week, determine what to do if receiver_type isn't known
 }

@@ -1,14 +1,14 @@
 /**
- * @file ipmReceiver_test.cxx ipmReceiver class Unit Tests
+ * @file Receiver_test.cxx Receiver class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "ipm/ipmReceiver.hpp"
+#include "ipm/Receiver.hpp"
 
-#define BOOST_TEST_MODULE ipmReceiver_test // NOLINT
+#define BOOST_TEST_MODULE Receiver_test // NOLINT
 
 #include <boost/test/unit_test.hpp>
 #include <string>
@@ -16,17 +16,17 @@
 
 using namespace dunedaq::ipm;
 
-BOOST_AUTO_TEST_SUITE(ipmReceiver_test)
+BOOST_AUTO_TEST_SUITE(Receiver_test)
 
 namespace {
 
-class ipmReceiverImpl : public ipmReceiver
+class ReceiverImpl : public Receiver
 {
 
 public:
   static const size_type bytesOnEachReceive = 10;
 
-  ipmReceiverImpl()
+  ReceiverImpl()
     : can_receive_(false)
   {}
 
@@ -49,32 +49,32 @@ private:
 
 BOOST_AUTO_TEST_CASE(CopyAndMoveSemantics)
 {
-  BOOST_REQUIRE(!std::is_copy_constructible_v<ipmReceiverImpl>);
-  BOOST_REQUIRE(!std::is_copy_assignable_v<ipmReceiverImpl>);
-  BOOST_REQUIRE(!std::is_move_constructible_v<ipmReceiverImpl>);
-  BOOST_REQUIRE(!std::is_move_assignable_v<ipmReceiverImpl>);
+  BOOST_REQUIRE(!std::is_copy_constructible_v<ReceiverImpl>);
+  BOOST_REQUIRE(!std::is_copy_assignable_v<ReceiverImpl>);
+  BOOST_REQUIRE(!std::is_move_constructible_v<ReceiverImpl>);
+  BOOST_REQUIRE(!std::is_move_assignable_v<ReceiverImpl>);
 }
 
 BOOST_AUTO_TEST_CASE(StatusChecks)
 {
-  ipmReceiverImpl theReceiver;
+  ReceiverImpl theReceiver;
 
   BOOST_REQUIRE(!theReceiver.can_receive());
 
   theReceiver.make_me_ready_to_receive();
   BOOST_REQUIRE(theReceiver.can_receive());
 
-  BOOST_REQUIRE_NO_THROW(theReceiver.receive(ipmReceiver::noblock));
-  BOOST_REQUIRE_NO_THROW(theReceiver.receive(ipmReceiver::noblock, ipmReceiverImpl::bytesOnEachReceive));
+  BOOST_REQUIRE_NO_THROW(theReceiver.receive(Receiver::noblock));
+  BOOST_REQUIRE_NO_THROW(theReceiver.receive(Receiver::noblock, ReceiverImpl::bytesOnEachReceive));
 
-  BOOST_REQUIRE_EXCEPTION(theReceiver.receive(ipmReceiver::noblock, ipmReceiverImpl::bytesOnEachReceive - 1),
+  BOOST_REQUIRE_EXCEPTION(theReceiver.receive(Receiver::noblock, ReceiverImpl::bytesOnEachReceive - 1),
                           dunedaq::ipm::UnexpectedNumberOfBytes,
                           [&](dunedaq::ipm::UnexpectedNumberOfBytes) { return true; });
 
   theReceiver.sabotage_my_receiving_ability();
   BOOST_REQUIRE(!theReceiver.can_receive());
 
-  BOOST_REQUIRE_EXCEPTION(theReceiver.receive(ipmReceiver::noblock),
+  BOOST_REQUIRE_EXCEPTION(theReceiver.receive(Receiver::noblock),
                           dunedaq::ipm::KnownStateForbidsReceive,
                           [&](dunedaq::ipm::KnownStateForbidsReceive) { return true; });
 }

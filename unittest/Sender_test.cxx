@@ -1,14 +1,14 @@
 /**
- * @file ipmSender_test.cxx ipmSender class Unit Tests
+ * @file Sender_test.cxx Sender class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "ipm/ipmSender.hpp"
+#include "ipm/Sender.hpp"
 
-#define BOOST_TEST_MODULE ipmSender_test // NOLINT
+#define BOOST_TEST_MODULE Sender_test // NOLINT
 
 #include <boost/test/unit_test.hpp>
 #include <string>
@@ -16,15 +16,15 @@
 
 using namespace dunedaq::ipm;
 
-BOOST_AUTO_TEST_SUITE(ipmSender_test)
+BOOST_AUTO_TEST_SUITE(Sender_test)
 
 namespace {
 
-class ipmSenderImpl : public ipmSender
+class SenderImpl : public Sender
 {
 
 public:
-  ipmSenderImpl()
+  SenderImpl()
     : can_send_(false)
   {}
 
@@ -47,15 +47,15 @@ private:
 
 BOOST_AUTO_TEST_CASE(CopyAndMoveSemantics)
 {
-  BOOST_REQUIRE(!std::is_copy_constructible_v<ipmSenderImpl>);
-  BOOST_REQUIRE(!std::is_copy_assignable_v<ipmSenderImpl>);
-  BOOST_REQUIRE(!std::is_move_constructible_v<ipmSenderImpl>);
-  BOOST_REQUIRE(!std::is_move_assignable_v<ipmSenderImpl>);
+  BOOST_REQUIRE(!std::is_copy_constructible_v<SenderImpl>);
+  BOOST_REQUIRE(!std::is_copy_assignable_v<SenderImpl>);
+  BOOST_REQUIRE(!std::is_move_constructible_v<SenderImpl>);
+  BOOST_REQUIRE(!std::is_move_assignable_v<SenderImpl>);
 }
 
 BOOST_AUTO_TEST_CASE(StatusChecks)
 {
-  ipmSenderImpl theSender;
+  SenderImpl theSender;
   std::vector<char> random_data{ 'T', 'E', 'S', 'T' };
 
   BOOST_REQUIRE(!theSender.can_send());
@@ -63,23 +63,23 @@ BOOST_AUTO_TEST_CASE(StatusChecks)
   theSender.make_me_ready_to_send();
   BOOST_REQUIRE(theSender.can_send());
 
-  BOOST_REQUIRE_NO_THROW(theSender.send(random_data.data(), random_data.size(), ipmSender::noblock));
+  BOOST_REQUIRE_NO_THROW(theSender.send(random_data.data(), random_data.size(), Sender::noblock));
 
   theSender.sabotage_my_sending_ability();
   BOOST_REQUIRE(!theSender.can_send());
 
-  BOOST_REQUIRE_EXCEPTION(theSender.send(random_data.data(), random_data.size(), ipmSender::noblock),
+  BOOST_REQUIRE_EXCEPTION(theSender.send(random_data.data(), random_data.size(), Sender::noblock),
                           dunedaq::ipm::KnownStateForbidsSend,
                           [&](dunedaq::ipm::KnownStateForbidsSend) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(BadInput)
 {
-  ipmSenderImpl theSender;
+  SenderImpl theSender;
   theSender.make_me_ready_to_send();
 
   const char* badBytes = nullptr;
-  BOOST_REQUIRE_EXCEPTION(theSender.send(badBytes, 10, ipmSender::noblock),
+  BOOST_REQUIRE_EXCEPTION(theSender.send(badBytes, 10, Sender::noblock),
                           dunedaq::ipm::NullPointerPassedToSend,
                           [&](dunedaq::ipm::NullPointerPassedToSend) { return true; });
 }
