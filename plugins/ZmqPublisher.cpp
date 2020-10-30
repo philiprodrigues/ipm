@@ -9,11 +9,11 @@
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "ZmqPublisher"
-#include <string>
 
 #include "ipm/Publisher.hpp"
 #include "ipm/ZmqContext.hpp"
 
+#include <string>
 #include <zmq.hpp>
 
 namespace dunedaq {

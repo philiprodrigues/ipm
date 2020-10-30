@@ -29,6 +29,7 @@
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -83,8 +84,8 @@ public:
   void send(const void* message, size_type message_size, const duration_type& timeout);
 
   void send_multipart(const void** message_parts,
-                              const std::vector<size_type>& message_sizes,
-                              const duration_type& timeout);
+                      const std::vector<size_type>& message_sizes,
+                      const duration_type& timeout);
 
   Sender(const Sender&) = delete;
   Sender& operator=(const Sender&) = delete;
@@ -95,7 +96,7 @@ public:
 protected:
   virtual void send_(const void* message, size_type N, const duration_type& timeout) = 0;
   virtual void send_multipart_(const void** message_parts,
-                              const std::vector<size_type>& message_sizes,
+                               const std::vector<size_type>& message_sizes,
                                const duration_type& timeout)
   {
     for (size_t i = 0; i < message_sizes.size(); ++i) {
@@ -123,7 +124,9 @@ Sender::send(const void* message, size_type message_size, const duration_type& t
 }
 
 inline void
-Sender::send_multipart(const void** message_parts, const std::vector<size_type>& message_sizes, const duration_type& timeout)
+Sender::send_multipart(const void** message_parts,
+                       const std::vector<size_type>& message_sizes,
+                       const duration_type& timeout)
 {
   if (message_sizes.empty()) {
     return;

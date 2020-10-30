@@ -9,8 +9,8 @@
  * received with this code.
  */
 
-#ifndef IPM_TEST_VECTORINTIPMSENDERDAQMODULE_HPP_
-#define IPM_TEST_VECTORINTIPMSENDERDAQMODULE_HPP_
+#ifndef IPM_TEST_PLUGINS_VECTORINTIPMSENDERDAQMODULE_HPP_
+#define IPM_TEST_PLUGINS_VECTORINTIPMSENDERDAQMODULE_HPP_
 
 #include "appfwk/DAQModule.hpp"
 #include "appfwk/DAQSource.hpp"
@@ -80,4 +80,4 @@ ERS_DECLARE_ISSUE_BASE(ipm,
                        ((std::string)message))
 } // namespace dunedaq
 
-#endif // IPM_TEST_VECTORINTIPMSENDERDAQMODULE_HPP_
+#endif // IPM_TEST_PLUGINS_VECTORINTIPMSENDERDAQMODULE_HPP_

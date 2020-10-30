@@ -33,6 +33,8 @@
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
 
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace dunedaq::ipm {
@@ -44,14 +46,13 @@ public:
   using duration_type = std::chrono::milliseconds;
   static constexpr duration_type block = std::chrono::duration_values<duration_type>::max();
   static constexpr duration_type noblock = std::chrono::duration_values<duration_type>::zero();
-  
+
   using size_type = int;
   static constexpr size_type anysize =
     0; // Since "I want 0 bytes" is pointless, "0" denotes "I don't care about the size"
 
   Subscriber() = default;
 
-  
   void connect_for_receives(const nlohmann::json& connection_info) final
   {
     connect_for_subscribes(connection_info);

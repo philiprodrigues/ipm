@@ -31,6 +31,7 @@
 #include <cetlib/BasicPluginFactory.h>
 #include <cetlib/compiler_macros.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 

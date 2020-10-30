@@ -13,6 +13,7 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include <vector>
+#include <set>
 
 using namespace dunedaq::ipm;
 
@@ -55,7 +56,7 @@ private:
   std::set<std::string> subscriptions_;
 };
 
-} // namespace
+} // namespace ""
 
 BOOST_AUTO_TEST_CASE(CopyAndMoveSemantics)
 {
