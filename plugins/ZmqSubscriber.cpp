@@ -26,7 +26,7 @@ public:
     : socket_(ZmqContext::instance().GetContext(), zmq::socket_type::sub)
   {}
   bool can_receive() const noexcept override;
-  void connect_for_receives(const nlohmann::json& connection_info);
+  void connect_for_subscribes(const nlohmann::json& connection_info) override;
 
   void subscribe(std::string const& topic) override;
   void unsubscribe(std::string const& topic) override;
@@ -46,7 +46,7 @@ ZmqSubscriber::can_receive() const noexcept
 }
 
 void
-ZmqSubscriber::connect_for_receives(const nlohmann::json& connection_info)
+ZmqSubscriber::connect_for_subscribes(const nlohmann::json& connection_info)
 {
   std::string connection_string = connection_info.value<std::string>("connection_string", "inproc://default");
   TLOG(TLVL_INFO) << "Connection String is " << connection_string;

@@ -51,6 +51,14 @@ public:
 
   Subscriber() = default;
 
+  
+  void connect_for_receives(const nlohmann::json& connection_info) final
+  {
+    connect_for_subscribes(connection_info);
+    subscribe("");
+  }
+  virtual void connect_for_subscribes(const nlohmann::json& connection_info) = 0;
+
   // receive() will perform some universally-desirable checks before calling user-implemented receive_:
   // -Throws KnownStateForbidsReceive if can_receive() == false
   // -Throws UnexpectedNumberOfBytes if the "nbytes" argument isn't anysize, and the

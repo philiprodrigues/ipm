@@ -54,7 +54,7 @@ ERS_DECLARE_ISSUE(ipm,
  */
 #define DEFINE_DUNE_IPM_SENDER(klass)                                                                                  \
   EXTERN_C_FUNC_DECLARE_START                                                                                          \
-  std::unique_ptr<dunedaq::ipm::Sender> make() { return std::unique_ptr<dunedaq::ipm::Sender>(new klass()); }          \
+  std::shared_ptr<dunedaq::ipm::Sender> make() { return std::shared_ptr<dunedaq::ipm::Sender>(new klass()); }          \
   }
 
 namespace dunedaq::ipm {

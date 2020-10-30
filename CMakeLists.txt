@@ -28,6 +28,15 @@ file(COPY test/simpleZmqSubscriber.json DESTINATION test)
 
 daq_add_unit_test(Sender_test LINK_LIBRARIES appfwk::appfwk)
 daq_add_unit_test(Receiver_test LINK_LIBRARIES appfwk::appfwk)
+daq_add_unit_test(Publisher_test LINK_LIBRARIES appfwk::appfwk)
+daq_add_unit_test(Subscriber_test LINK_LIBRARIES appfwk::appfwk)
+
+
+daq_add_unit_test(ZmqSender_test LINK_LIBRARIES appfwk::appfwk)
+daq_add_unit_test(ZmqReceiver_test LINK_LIBRARIES appfwk::appfwk)
+daq_add_unit_test(ZmqPublisher_test LINK_LIBRARIES appfwk::appfwk)
+daq_add_unit_test(ZmqSubscriber_test LINK_LIBRARIES appfwk::appfwk)
+set_tests_properties(ZmqSender_test ZmqReceiver_test ZmqPublisher_test ZmqSubscriber_test PROPERTIES ENVIRONMENT "CET_PLUGIN_PATH=${CMAKE_CURRENT_BINARY_DIR}/plugins:$ENV{CET_PLUGIN_PATH}")
 
 
 daq_install()
