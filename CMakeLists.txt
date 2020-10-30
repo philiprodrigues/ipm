@@ -19,6 +19,8 @@ daq_add_plugin(ZmqSubscriber duneIPM LINK_LIBRARIES ${ZMQ} appfwk::appfwk)
 
 daq_add_plugin(VectorIntIPMSenderDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk::appfwk)
 daq_add_plugin(VectorIntIPMReceiverDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk::appfwk)
+daq_add_plugin(VectorIntIPMPublisherDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk::appfwk)
+daq_add_plugin(VectorIntIPMSubscriberDAQModule duneDAQModule TEST LINK_LIBRARIES appfwk::appfwk)
 
 file(COPY test/singleProcess.json DESTINATION test)
 file(COPY test/simpleZmqSender.json DESTINATION test)
