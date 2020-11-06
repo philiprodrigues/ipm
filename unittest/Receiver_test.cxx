@@ -36,9 +36,12 @@ public:
   void sabotage_my_receiving_ability() { can_receive_ = false; }
 
 protected:
-  std::vector<char> receive_(const duration_type& /* timeout */) override
+  Receiver::Response receive_(const duration_type& /* timeout */) override
   {
-    return std::vector<char>(bytesOnEachReceive, 'A');
+    Receiver::Response output;
+    output.data = std::vector<char>(bytesOnEachReceive, 'A');
+    output.metadata = "";
+    return output;
   }
 
 private:

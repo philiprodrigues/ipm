@@ -98,8 +98,8 @@ VectorIntIPMReceiverDAQModule::do_work(std::atomic<bool>& running_flag)
       std::vector<int> output(nIntsPerVector_);
 
       auto recvd = input_->receive(queueTimeout_);
-      assert(recvd.size() == nIntsPerVector_ * sizeof(int));
-      memcpy(&output[0], &recvd[0], sizeof(int) * nIntsPerVector_);
+      assert(recvd.data.size() == nIntsPerVector_ * sizeof(int));
+      memcpy(&output[0], &recvd.data[0], sizeof(int) * nIntsPerVector_);
 
       oss << ": Received vector " << counter << " with size " << output.size();
       ers::info(ReceiverProgressUpdate(ERS_HERE, get_name(), oss.str()));

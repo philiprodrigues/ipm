@@ -6,7 +6,7 @@
  * received with this code.
  */
 
-#include "ipm/Publisher.hpp"
+#include "ipm/Sender.hpp"
 
 #define BOOST_TEST_MODULE ZmqPublisher_test // NOLINT
 
@@ -23,11 +23,6 @@ BOOST_AUTO_TEST_CASE(BasicTests)
   auto theSender = makeIPMSender("ZmqPublisher");
   BOOST_REQUIRE(theSender != nullptr);
   BOOST_REQUIRE(!theSender->can_send());
-
-  auto thePublisher = makeIPMPublisher("ZmqPublisher");
-  BOOST_REQUIRE(thePublisher != nullptr);
-  BOOST_REQUIRE(!thePublisher->can_send());
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

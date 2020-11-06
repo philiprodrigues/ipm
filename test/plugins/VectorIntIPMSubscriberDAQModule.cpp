@@ -103,12 +103,11 @@ VectorIntIPMSubscriberDAQModule::do_work(std::atomic<bool>& running_flag)
       TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
       std::vector<int> output(nIntsPerVector_);
 
-      std::string topic_out = "";
-      auto recvd = input_->receive(queueTimeout_, topic_out);
-      assert(recvd.size() == nIntsPerVector_ * sizeof(int));
-      memcpy(&output[0], &recvd[0], sizeof(int) * nIntsPerVector_);
+      auto recvd = input_->receive(queueTimeout_);
+      assert(recvd.data.size() == nIntsPerVector_ * sizeof(int));
+      memcpy(&output[0], &recvd.data[0], sizeof(int) * nIntsPerVector_);
 
-      oss << ": Received vector " << counter << " with size " << output.size() << " on topic " << topic_out;
+      oss << ": Received vector " << counter << " with size " << output.size() << " on topic " << recvd.metadata;
       ers::info(SubscriberProgressUpdate(ERS_HERE, get_name(), oss.str()));
       oss.str("");
 

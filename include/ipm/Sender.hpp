@@ -81,11 +81,15 @@ public:
   // -Throws NullPointerPassedToSend if message is a null pointer
   // -If message_size == 0, function is a no-op
 
-  void send(const void* message, size_type message_size, const duration_type& timeout);
+  void send(const void* message,
+            size_type message_size,
+            const duration_type& timeout,
+            std::string const& metadata = "");
 
   void send_multipart(const void** message_parts,
                       const std::vector<size_type>& message_sizes,
-                      const duration_type& timeout);
+                      const duration_type& timeout,
+                      std::string const& metadata = "");
 
   Sender(const Sender&) = delete;
   Sender& operator=(const Sender&) = delete;
@@ -94,19 +98,20 @@ public:
   Sender& operator=(Sender&&) = delete;
 
 protected:
-  virtual void send_(const void* message, size_type N, const duration_type& timeout) = 0;
+  virtual void send_(const void* message, size_type N, const duration_type& timeout, std::string const& metadata) = 0;
   virtual void send_multipart_(const void** message_parts,
                                const std::vector<size_type>& message_sizes,
-                               const duration_type& timeout)
+                               const duration_type& timeout,
+                               std::string const& metadata)
   {
     for (size_t i = 0; i < message_sizes.size(); ++i) {
-      send_(message_parts[i], message_sizes[i], timeout);
+      send_(message_parts[i], message_sizes[i], timeout, metadata);
     }
   }
 };
 
 inline void
-Sender::send(const void* message, size_type message_size, const duration_type& timeout)
+Sender::send(const void* message, size_type message_size, const duration_type& timeout, std::string const& metadata)
 {
   if (message_size == 0) {
     return;
@@ -120,13 +125,14 @@ Sender::send(const void* message, size_type message_size, const duration_type& t
     throw NullPointerPassedToSend(ERS_HERE);
   }
 
-  send_(message, message_size, timeout);
+  send_(message, message_size, timeout, metadata);
 }
 
 inline void
 Sender::send_multipart(const void** message_parts,
                        const std::vector<size_type>& message_sizes,
-                       const duration_type& timeout)
+                       const duration_type& timeout,
+                       std::string const& metadata)
 {
   if (message_sizes.empty()) {
     return;
@@ -140,7 +146,7 @@ Sender::send_multipart(const void** message_parts,
     throw NullPointerPassedToSend(ERS_HERE);
   }
 
-  send_multipart_(message_parts, message_sizes, timeout);
+  send_multipart_(message_parts, message_sizes, timeout, metadata);
 }
 
 std::shared_ptr<Sender>

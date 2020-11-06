@@ -11,9 +11,9 @@
 #define BOOST_TEST_MODULE Subscriber_test // NOLINT
 
 #include <boost/test/unit_test.hpp>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 using namespace dunedaq::ipm;
 
@@ -32,7 +32,7 @@ public:
     , subscriptions_()
   {}
 
-  void connect_for_subscribes(const nlohmann::json& /* connection_info */) {}
+  void connect_for_receives(const nlohmann::json& /* connection_info */) {}
   bool can_receive() const noexcept override { return can_receive_; }
   void make_me_ready_to_receive() { can_receive_ = true; }
   void sabotage_my_receiving_ability() { can_receive_ = false; }
@@ -43,12 +43,13 @@ public:
   std::set<std::string> get_subscriptions() const { return subscriptions_; }
 
 protected:
-  std::vector<char> receive_(const duration_type& /* timeout */, std::string& topic) override
+  Receiver::Response receive_(const duration_type& /* timeout */) override
   {
-    if (topic == "") {
-      topic = "TEST";
-    }
-    return std::vector<char>(bytesOnEachReceive, 'A');
+    Receiver::Response output;
+    output.data = std::vector<char>(bytesOnEachReceive, 'A');
+    output.metadata = "TEST";
+
+    return output;
   }
 
 private:
@@ -56,7 +57,7 @@ private:
   std::set<std::string> subscriptions_;
 };
 
-} // namespace ""
+} // namespace
 
 BOOST_AUTO_TEST_CASE(CopyAndMoveSemantics)
 {
@@ -84,19 +85,17 @@ BOOST_AUTO_TEST_CASE(StatusChecks)
   subs = theSubscriber.get_subscriptions();
   BOOST_REQUIRE_EQUAL(subs.size(), 0);
 
-  std::string topic = "";
+  BOOST_REQUIRE_NO_THROW(theSubscriber.receive(Subscriber::noblock ));
+  BOOST_REQUIRE_NO_THROW(theSubscriber.receive(Subscriber::noblock, SubscriberImpl::bytesOnEachReceive));
 
-  BOOST_REQUIRE_NO_THROW(theSubscriber.receive(Subscriber::noblock, topic));
-  BOOST_REQUIRE_NO_THROW(theSubscriber.receive(Subscriber::noblock, topic, SubscriberImpl::bytesOnEachReceive));
-
-  BOOST_REQUIRE_EXCEPTION(theSubscriber.receive(Subscriber::noblock, topic, SubscriberImpl::bytesOnEachReceive - 1),
+  BOOST_REQUIRE_EXCEPTION(theSubscriber.receive(Subscriber::noblock, SubscriberImpl::bytesOnEachReceive - 1),
                           dunedaq::ipm::UnexpectedNumberOfBytes,
                           [&](dunedaq::ipm::UnexpectedNumberOfBytes) { return true; });
 
   theSubscriber.sabotage_my_receiving_ability();
   BOOST_REQUIRE(!theSubscriber.can_receive());
 
-  BOOST_REQUIRE_EXCEPTION(theSubscriber.receive(Subscriber::noblock, topic),
+  BOOST_REQUIRE_EXCEPTION(theSubscriber.receive(Subscriber::noblock),
                           dunedaq::ipm::KnownStateForbidsReceive,
                           [&](dunedaq::ipm::KnownStateForbidsReceive) { return true; });
 }

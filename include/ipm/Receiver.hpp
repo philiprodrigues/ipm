@@ -85,7 +85,13 @@ public:
   // -Throws UnexpectedNumberOfBytes if the "nbytes" argument isn't anysize, and the
   //  received bytes inside the function aren't the same number as nbytes
 
-  std::vector<char> receive(const duration_type& timeout, size_type nbytes = anysize);
+  struct Response
+  {
+    std::string metadata{ "" };
+    std::vector<char> data{};
+  };
+
+  Response receive(const duration_type& timeout, size_type nbytes = anysize);
 
   Receiver(const Receiver&) = delete;
   Receiver& operator=(const Receiver&) = delete;
@@ -94,19 +100,19 @@ public:
   Receiver& operator=(Receiver&&) = delete;
 
 protected:
-  virtual std::vector<char> receive_(const duration_type& timeout) = 0;
+  virtual Response receive_(const duration_type& timeout) = 0;
 };
 
-inline std::vector<char>
+inline Receiver::Response
 Receiver::receive(const duration_type& timeout, size_type bytes)
 {
   if (!can_receive()) {
     throw KnownStateForbidsReceive(ERS_HERE);
   }
-  std::vector<char> message = receive_(timeout);
+  auto message = receive_(timeout);
 
   if (bytes != anysize) {
-    auto received_size = static_cast<size_type>(message.size());
+    auto received_size = static_cast<size_type>(message.data.size());
     if (received_size != bytes) {
       throw UnexpectedNumberOfBytes(ERS_HERE, received_size, bytes);
     }
