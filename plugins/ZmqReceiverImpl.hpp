@@ -53,7 +53,7 @@ public:
 protected:
   Receiver::Response receive_(const duration_type& timeout) override
   {
-    auto timeout_in_ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count());
+    auto timeout_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count();
     socket_.setsockopt(ZMQ_RCVTIMEO, timeout_in_ms);
     Receiver::Response output;
     zmq::message_t hdr, msg;

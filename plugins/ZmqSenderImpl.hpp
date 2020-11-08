@@ -43,9 +43,21 @@ public:
 protected:
   void send_(const void* message, int N, const duration_type& timeout, std::string const& topic) override
   {
+
+    auto timeout_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count();
+
+    // The "2" is because there are two 0MQ sends in this
+    // function. Hopefully most timeouts are even, and more than
+    // several milliseconds...
+
+    timeout_in_ms /= 2;  
+
+    socket_.setsockopt(ZMQ_SNDTIMEO, timeout_in_ms ); 
+
     zmq::message_t topic_msg(topic.c_str(), topic.size());
-    zmq::message_t msg(message, N);
     socket_.send(topic_msg, ZMQ_SNDMORE);
+
+    zmq::message_t msg(message, N);
     socket_.send(msg);
   }
 
