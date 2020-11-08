@@ -1,14 +1,14 @@
 /**
- * @file ipmReceiver.hpp ipmReceiver Class Interface
+ * @file Receiver.hpp Receiver Class Interface
  *
- * ipmReceiver defines the interface of objects which can receive messages
+ * Receiver defines the interface of objects which can receive messages
  * between processes
  *
  * Implementor of this interface is required to:
  *
  * - Implement the protected virtual receive_ function, called by public non-virtual receive
  * - Implement the public virtual can_receive function
- * - Implement the public virtual connect_for_receives function  
+ * - Implement the public virtual connect_for_receives function
  *
  * And is encouraged to:
  *
@@ -20,12 +20,17 @@
  * received with this code.
  */
 
-#ifndef IPM_INCLUDE_IPM_IPMRECEIVER_HPP_
-#define IPM_INCLUDE_IPM_IPMRECEIVER_HPP_
+#ifndef IPM_INCLUDE_IPM_RECEIVER_HPP_
+#define IPM_INCLUDE_IPM_RECEIVER_HPP_
 
 #include "ers/Issue.h"
 #include "nlohmann/json.hpp"
 
+#include <cetlib/BasicPluginFactory.h>
+#include <cetlib/compiler_macros.h>
+
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace dunedaq {
@@ -40,9 +45,24 @@ ERS_DECLARE_ISSUE(ipm,
                   ((int)timeout)) // NOLINT
 } // namespace dunedaq
 
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START                                                                                    \
+  extern "C"                                                                                                           \
+  {
+#endif
+
+/**
+ * @brief Declare the function that will be called by the plugin loader
+ * @param klass Class to be defined as a DUNE IPM Receiver
+ */
+#define DEFINE_DUNE_IPM_RECEIVER(klass)                                                                                \
+  EXTERN_C_FUNC_DECLARE_START                                                                                          \
+  std::shared_ptr<dunedaq::ipm::Receiver> make() { return std::shared_ptr<dunedaq::ipm::Receiver>(new klass()); }      \
+  }
+
 namespace dunedaq::ipm {
 
-class ipmReceiver
+class Receiver
 {
 
 public:
@@ -54,9 +74,9 @@ public:
   static constexpr size_type anysize =
     0; // Since "I want 0 bytes" is pointless, "0" denotes "I don't care about the size"
 
-  ipmReceiver() = default;
+  Receiver() = default;
 
-  virtual void connect_for_receives(const nlohmann::json& connection_info) = 0; 
+  virtual void connect_for_receives(const nlohmann::json& connection_info) = 0;
 
   virtual bool can_receive() const noexcept = 0;
 
@@ -65,41 +85,34 @@ public:
   // -Throws UnexpectedNumberOfBytes if the "nbytes" argument isn't anysize, and the
   //  received bytes inside the function aren't the same number as nbytes
 
-  std::vector<char> receive(const duration_type& timeout, size_type nbytes = anysize);
-
-  // Is it worth also implementing a receive_multipart where you tell
-  // the function the various sizes of each message you expect?
-
-  std::vector<std::vector<char>> receive_multipart(const duration_type& timeout_per_message, size_type n_messages)
+  struct Response
   {
-    std::vector<std::vector<char>> messages;
+    std::string metadata{ "" };
+    std::vector<char> data{};
+  };
 
-    for (size_type i_message = 0; i_message < n_messages; ++i_message) {
-      messages.emplace_back(receive(timeout_per_message));
-    }
-    return messages;
-  }
+  Response receive(const duration_type& timeout, size_type nbytes = anysize);
 
-  ipmReceiver(const ipmReceiver&) = delete;
-  ipmReceiver& operator=(const ipmReceiver&) = delete;
+  Receiver(const Receiver&) = delete;
+  Receiver& operator=(const Receiver&) = delete;
 
-  ipmReceiver(ipmReceiver&&) = delete;
-  ipmReceiver& operator=(ipmReceiver&&) = delete;
+  Receiver(Receiver&&) = delete;
+  Receiver& operator=(Receiver&&) = delete;
 
 protected:
-  virtual std::vector<char> receive_(const duration_type& timeout) = 0;
+  virtual Response receive_(const duration_type& timeout) = 0;
 };
 
-inline std::vector<char>
-ipmReceiver::receive(const duration_type& timeout, size_type bytes)
+inline Receiver::Response
+Receiver::receive(const duration_type& timeout, size_type bytes)
 {
   if (!can_receive()) {
     throw KnownStateForbidsReceive(ERS_HERE);
   }
-  std::vector<char> message = receive_(timeout);
+  auto message = receive_(timeout);
 
   if (bytes != anysize) {
-    auto received_size = static_cast<size_type>(message.size());
+    auto received_size = static_cast<size_type>(message.data.size());
     if (received_size != bytes) {
       throw UnexpectedNumberOfBytes(ERS_HERE, received_size, bytes);
     }
@@ -108,6 +121,13 @@ ipmReceiver::receive(const duration_type& timeout, size_type bytes)
   return message;
 }
 
+std::shared_ptr<Receiver>
+makeIPMReceiver(std::string const& plugin_name)
+{
+  static cet::BasicPluginFactory bpf("duneIPM", "make");
+  return bpf.makePlugin<std::shared_ptr<Receiver>>(plugin_name);
+}
+
 } // namespace dunedaq::ipm
 
-#endif // IPM_INCLUDE_IPM_IPMRECEIVER_HPP_
+#endif // IPM_INCLUDE_IPM_RECEIVER_HPP_

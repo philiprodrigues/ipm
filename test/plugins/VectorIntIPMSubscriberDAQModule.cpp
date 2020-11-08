@@ -1,5 +1,5 @@
 /**
- * @file VectorIntIPMReceiverDAQModule.cc VectorIntIPMReceiverDAQModule class
+ * @file VectorIntIPMSubscriberDAQModule.cc VectorIntIPMSubscriberDAQModule class
  * implementation
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -7,7 +7,7 @@
  * received with this code.
  */
 
-#include "VectorIntIPMReceiverDAQModule.hpp"
+#include "VectorIntIPMSubscriberDAQModule.hpp"
 
 #include "appfwk/cmd/Nljs.hpp"
 #include "ipm/viir/Nljs.hpp"
@@ -22,27 +22,28 @@
 /**
  * @brief Name used by TRACE TLOG calls from this source file
  */
-#define TRACE_NAME "VectorIntIPMReceiver" // NOLINT
+#define TRACE_NAME "VectorIntIPMSubscriber" // NOLINT
 
 namespace dunedaq {
 namespace ipm {
 
-VectorIntIPMReceiverDAQModule::VectorIntIPMReceiverDAQModule(const std::string& name)
+VectorIntIPMSubscriberDAQModule::VectorIntIPMSubscriberDAQModule(const std::string& name)
   : appfwk::DAQModule(name)
-  , thread_(std::bind(&VectorIntIPMReceiverDAQModule::do_work, this, std::placeholders::_1))
+  , thread_(std::bind(&VectorIntIPMSubscriberDAQModule::do_work, this, std::placeholders::_1))
   , outputQueue_(nullptr)
 {
 
-  register_command("configure", &VectorIntIPMReceiverDAQModule::do_configure);
-  register_command("start", &VectorIntIPMReceiverDAQModule::do_start);
-  register_command("stop", &VectorIntIPMReceiverDAQModule::do_stop);
+  register_command("configure", &VectorIntIPMSubscriberDAQModule::do_configure);
+  register_command("start", &VectorIntIPMSubscriberDAQModule::do_start);
+  register_command("stop", &VectorIntIPMSubscriberDAQModule::do_stop);
 }
 
 void
-VectorIntIPMReceiverDAQModule::init(const data_t& init_data)
+VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
 {
 
-  std::string receiver_type = "ZmqReceiver";
+  std::string Subscriber_type = "ZmqSubscriber";
+  std::string topic = "VectorIntTopic";
 
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
@@ -51,19 +52,24 @@ VectorIntIPMReceiverDAQModule::init(const data_t& init_data)
       outputQueue_.reset(new appfwk::DAQSink<std::vector<int>>(qi.inst));
     }
 
-    if (qi.name == "receiver_type") {
-      receiver_type = qi.inst;
+    if (qi.name == "Subscriber_type") {
+      Subscriber_type = qi.inst;
+    }
+
+    if (qi.name == "topic") {
+      topic = qi.inst;
     }
   }
   
-  input_ = makeIPMReceiver(receiver_type);
+  input_ = makeIPMSubscriber(Subscriber_type);
+  input_->subscribe(topic);
 
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
-  // In the next week, determine what to do if receiver_type isn't known
+  // In the next week, determine what to do if Subscriber_type isn't known
 }
 
 void
-VectorIntIPMReceiverDAQModule::do_configure(const data_t& config_data)
+VectorIntIPMSubscriberDAQModule::do_configure(const data_t& config_data)
 {
   cfg_ = config_data.get<viir::Conf>();
 
@@ -74,19 +80,19 @@ VectorIntIPMReceiverDAQModule::do_configure(const data_t& config_data)
 }
 
 void
-VectorIntIPMReceiverDAQModule::do_start(const data_t& /*args*/)
+VectorIntIPMSubscriberDAQModule::do_start(const data_t& /*args*/)
 {
   thread_.start_working_thread();
 }
 
 void
-VectorIntIPMReceiverDAQModule::do_stop(const data_t& /*args*/)
+VectorIntIPMSubscriberDAQModule::do_stop(const data_t& /*args*/)
 {
   thread_.stop_working_thread();
 }
 
 void
-VectorIntIPMReceiverDAQModule::do_work(std::atomic<bool>& running_flag)
+VectorIntIPMSubscriberDAQModule::do_work(std::atomic<bool>& running_flag)
 {
   size_t counter = 0;
   std::ostringstream oss;
@@ -101,8 +107,8 @@ VectorIntIPMReceiverDAQModule::do_work(std::atomic<bool>& running_flag)
       assert(recvd.data.size() == nIntsPerVector_ * sizeof(int));
       memcpy(&output[0], &recvd.data[0], sizeof(int) * nIntsPerVector_);
 
-      oss << ": Received vector " << counter << " with size " << output.size();
-      ers::info(ReceiverProgressUpdate(ERS_HERE, get_name(), oss.str()));
+      oss << ": Received vector " << counter << " with size " << output.size() << " on topic " << recvd.metadata;
+      ers::info(SubscriberProgressUpdate(ERS_HERE, get_name(), oss.str()));
       oss.str("");
 
       TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
@@ -123,4 +129,4 @@ VectorIntIPMReceiverDAQModule::do_work(std::atomic<bool>& running_flag)
 } // namespace ipm
 } // namespace dunedaq
 
-DEFINE_DUNE_DAQ_MODULE(dunedaq::ipm::VectorIntIPMReceiverDAQModule)
+DEFINE_DUNE_DAQ_MODULE(dunedaq::ipm::VectorIntIPMSubscriberDAQModule)

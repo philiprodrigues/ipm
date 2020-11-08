@@ -1,9 +1,0 @@
-#include "appfwk/IPMSenderDAQModule.hpp"
-
-namespace dunedaq::appfwk {
-
-typedef dunedaq::appfwk::IPMSenderDAQModule<@MAKE_DATATYPE_CPPTYPE@>
-  @MAKE_DATATYPE_PREFIX@IPMSenderDAQModule;
-}
-
-DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::@MAKE_DATATYPE_PREFIX@IPMSenderDAQModule)

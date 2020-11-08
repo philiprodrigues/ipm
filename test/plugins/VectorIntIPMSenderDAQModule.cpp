@@ -8,7 +8,6 @@
  */
 
 #include "VectorIntIPMSenderDAQModule.hpp"
-#include "ipm/ZmqSender.hpp"
 
 #include "appfwk/cmd/Nljs.hpp"
 #include "ipm/viis/Nljs.hpp"
@@ -44,7 +43,7 @@ VectorIntIPMSenderDAQModule::VectorIntIPMSenderDAQModule(const std::string& name
 void
 VectorIntIPMSenderDAQModule::init(const data_t& init_data)
 {
-  std::string sender_type = "Zmq";
+  std::string sender_type = "ZmqSender";
 
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
@@ -58,9 +57,7 @@ VectorIntIPMSenderDAQModule::init(const data_t& init_data)
     }
   }
 
-  if (sender_type == "Zmq") {
-    output_.reset(new ZmqSender());
-  }
+  output_ = makeIPMSender(sender_type);
 
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
   // In the next week, determine what to do if sender_type isn't known

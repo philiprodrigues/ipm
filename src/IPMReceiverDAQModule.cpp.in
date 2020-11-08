@@ -1,9 +1,0 @@
-#include "appfwk/IPMReceiverDAQModule.hpp"
-
-namespace dunedaq::appfwk {
-
-typedef dunedaq::appfwk::IPMReceiverDAQModule<@MAKE_DATATYPE_CPPTYPE@>
-  @MAKE_DATATYPE_PREFIX@IPMReceiverDAQModule;
-}
-
-DEFINE_DUNE_DAQ_MODULE(dunedaq::appfwk::@MAKE_DATATYPE_PREFIX@IPMReceiverDAQModule)
