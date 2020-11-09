@@ -1,5 +1,4 @@
 /**
- *
  * @file ZmqSender_test.cxx ZmqSender class Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -7,24 +6,24 @@
  * received with this code.
  */
 
-#include "../src/ZmqSender.cpp"
+#include "ipm/Sender.hpp"
 
 #define BOOST_TEST_MODULE ZmqSender_test // NOLINT
+
 #include <boost/test/unit_test.hpp>
+#include <string>
+#include <vector>
 
-#include <boost/asio/signal_set.hpp>
+using namespace dunedaq::ipm;
 
-#include <chrono>
-#include <memory>
+BOOST_AUTO_TEST_SUITE(ZmqSender_test)
 
-BOOST_AUTO_TEST_CASE(sanity_checks)
+BOOST_AUTO_TEST_CASE(BasicTests)
 {
-
-  std::unique_ptr<dunedaq::ipm::ZmqSender> umth_ptr = nullptr;
-
-  auto starttime = std::chrono::steady_clock::now();
-  BOOST_REQUIRE_NO_THROW(umth_ptr = std::make_unique<dunedaq::ipm::ZmqSender>());
-  auto construction_time_in_ms =
-    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - starttime).count();
-  BOOST_TEST_MESSAGE("Construction time was " << construction_time_in_ms << " ms");
+  auto theSender = makeIPMSender("ZmqSender");
+  BOOST_REQUIRE(theSender != nullptr);
+  BOOST_REQUIRE(!theSender->can_send());
 }
+
+
+BOOST_AUTO_TEST_SUITE_END()
