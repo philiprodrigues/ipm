@@ -8,11 +8,11 @@
 local moo = import "moo.jsonnet";
 
 // A schema builder in the given path (namespace)
-local ns = "dunedaq.ipm.viis";
+local ns = "dunedaq.ipm.viisu";
 local s = moo.oschema.schema(ns);
 
 // Object structure used by the test/fake producer module
-local viis = {
+local viisu = {
     size_t_attempt: s.number("Size_t", "u8",
                      doc="Same as a size_t in gcc v8.2.0"),
 
@@ -24,11 +24,11 @@ local viis = {
                 doc="Number of numbers"),
         s.field("queue_timeout_ms", self.int_attempt, 100,
                 doc="Milliseconds to wait on queue before timing out"),
-        s.field("sender_type", string, "ZmqSender", doc="Sender plugin type"),
-        s.field("topic", string, "", doc="Optional metadata to include in sends"),
-    ], doc="VectorIntIPMSenderDAQModule Configuration"),
+        s.field("subscriber_type", string, "ZmqSubscriber", doc="Subscriber plugin type"),
+        s.field("topic", string, "VectorIntTopic", doc="Topic for test"),
+    ], doc="VectorIntIPMReceiverDAQModule Configuration"),
 
 };
 
-moo.oschema.sort_select(viis, ns)
+moo.oschema.sort_select(viisu, ns)
 

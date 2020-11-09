@@ -24,9 +24,9 @@ local viir = {
                 doc="Number of numbers"),
         s.field("queue_timeout_ms", self.int_attempt, 100,
                 doc="Milliseconds to wait on queue before timing out"),
+                s.field("receiver_type", string, "ZmqReceiver", doc="Receiver plugin type")
     ], doc="VectorIntIPMReceiverDAQModule Configuration"),
 
 };
 
 moo.oschema.sort_select(viir, ns)
-

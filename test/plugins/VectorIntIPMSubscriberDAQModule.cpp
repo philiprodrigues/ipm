@@ -42,7 +42,7 @@ void
 VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
 {
 
-  std::string Subscriber_type = "ZmqSubscriber";
+  std::string subscriber_type = "ZmqSubscriber";
   std::string topic = "VectorIntTopic";
 
   auto ini = init_data.get<appfwk::cmd::ModInit>();
@@ -52,8 +52,8 @@ VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
       outputQueue_.reset(new appfwk::DAQSink<std::vector<int>>(qi.inst));
     }
 
-    if (qi.name == "Subscriber_type") {
-      Subscriber_type = qi.inst;
+    if (qi.name == "subscriber_type") {
+      subscriber_type = qi.inst;
     }
 
     if (qi.name == "topic") {
@@ -61,11 +61,11 @@ VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
     }
   }
   
-  input_ = makeIPMSubscriber(Subscriber_type);
+  input_ = makeIPMSubscriber(subscriber_type);
   input_->subscribe(topic);
 
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
-  // In the next week, determine what to do if Subscriber_type isn't known
+  // In the next week, determine what to do if subscriber_type isn't known
 }
 
 void

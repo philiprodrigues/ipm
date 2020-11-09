@@ -55,6 +55,10 @@ VectorIntIPMSenderDAQModule::init(const data_t& init_data)
     if (qi.name == "sender_type") {
       sender_type = qi.inst;
     }
+
+    if (qi.name == "topic") {
+      topic_ = qi.inst;
+    }
   }
 
   output_ = makeIPMSender(sender_type);
@@ -105,7 +109,7 @@ VectorIntIPMSenderDAQModule::do_work(std::atomic<bool>& running_flag)
       }
 
       TLOG(TLVL_TRACE) << get_name() << ": Received vector of size " << vec.size() << " from queue, sending";
-      output_->send(&vec[0], vec.size() * sizeof(int), queueTimeout_);
+      output_->send(&vec[0], vec.size() * sizeof(int), queueTimeout_, topic_);
 
       counter++;
       oss << ": Sent " << counter << " vectors";

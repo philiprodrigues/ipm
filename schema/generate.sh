@@ -41,3 +41,5 @@ render viir Nljs    $srcdir/test/ipm/viir
 render viis Structs $srcdir/test/ipm/viis
 render viis Nljs    $srcdir/test/ipm/viis
 
+render viisu Structs $srcdir/test/ipm/viisu
+render viisu Nljs    $srcdir/test/ipm/viisu

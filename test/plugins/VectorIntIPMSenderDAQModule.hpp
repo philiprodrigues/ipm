@@ -69,6 +69,7 @@ private:
   std::chrono::milliseconds queueTimeout_;
   std::unique_ptr<appfwk::DAQSource<std::vector<int>>> inputQueue_;
   std::shared_ptr<Sender> output_;
+  std::string topic_{ "" };
 };
 
 } // namespace ipm
