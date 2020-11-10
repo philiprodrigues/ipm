@@ -4,8 +4,11 @@
     queue: "input",
 
     // Make a conf object for FDC
-    conf(nper, beg, end, toms=100) :: {
-        nIntsPerVector: nper, starting_int: beg, ending_int: end,
-        queue_timeout_ms: toms, 
+    conf(nper, conninfo, sender="ZmqSender", tpc="", toms=100) :: {
+        nIntsPerVector: nper,
+        queue_timeout_ms: toms,
+        sender_type: sender,
+        connection_info: conninfo,
+        topic: tpc
     },
 }

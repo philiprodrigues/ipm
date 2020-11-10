@@ -38,6 +38,9 @@ namespace dunedaq::ipm::viis {
         // @brief Optional metadata to include in sends
         String topic;
 
+        // @brief IPMSender Implementation Plugin to load
+        String sender_type;
+
         // @brief Conneection Info
         ConnectionInfo connection_info;
     };

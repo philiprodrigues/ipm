@@ -41,25 +41,13 @@ VectorIntIPMSubscriberDAQModule::VectorIntIPMSubscriberDAQModule(const std::stri
 void
 VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
 {
-
-  std::string subscriber_type = "ZmqSubscriber";
-
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
     if (qi.name == "output") {
       ERS_INFO("VIIRDM: output queue is " << qi.inst);
       outputQueue_.reset(new appfwk::DAQSink<std::vector<int>>(qi.inst));
     }
-
-    if (qi.name == "subscriber_type") {
-      subscriber_type = qi.inst;
-    }
   }
-  
-  input_ = makeIPMSubscriber(subscriber_type);
-
-  // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
-  // In the next week, determine what to do if subscriber_type isn't known
 }
 
 void
@@ -69,6 +57,8 @@ VectorIntIPMSubscriberDAQModule::do_configure(const data_t& config_data)
 
   nIntsPerVector_ = cfg_.nIntsPerVector;
   queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
+
+  input_ = makeIPMSubscriber(cfg_.receiver_type);
 
   std::string topic = cfg_.topic;
   ERS_INFO("VIISubDM: topic is " << topic);

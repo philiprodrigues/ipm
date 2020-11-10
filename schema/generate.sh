@@ -5,6 +5,8 @@
 
 mydir=$(dirname $(realpath $BASH_SOURCE))
 srcdir=$(dirname $mydir)
+appfwkdir=$(realpath $mydir/../../appfwk/schema)
+echo "Mydir $mydir, Appfwkdir $appfwkdir"
 
 runmoo () {
     moo -g '/lang:ocpp.jsonnet' -M $mydir "$@"
@@ -30,8 +32,22 @@ render () {
     echo $outhpp
 }
 
+compile () {
+    local name="$1"; shift
+
+    moo -M $mydir -T $mydir -M $appfwkdir -T $appfwkdir compile ipm-$name-job.jsonnet >ipm-$name-job.json
+}
+
 render viir Structs $srcdir/test/include/ipm/viir
 render viir Nljs    $srcdir/test/include/ipm/viir
 
 render viis Structs $srcdir/test/include/ipm/viis
 render viis Nljs    $srcdir/test/include/ipm/viis
+
+
+compile singleprocess
+compile singleprocess-pubsub
+compile zmqpublisher
+compile zmqreceiver
+compile zmqsender
+compile zmqsubscriber

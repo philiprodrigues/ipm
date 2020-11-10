@@ -41,25 +41,13 @@ VectorIntIPMReceiverDAQModule::VectorIntIPMReceiverDAQModule(const std::string& 
 void
 VectorIntIPMReceiverDAQModule::init(const data_t& init_data)
 {
-
-  std::string receiver_type = "ZmqReceiver";
-
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
     if (qi.name == "output") {
       ERS_INFO("VIIRDM: output queue is " << qi.inst);
       outputQueue_.reset(new appfwk::DAQSink<std::vector<int>>(qi.inst));
     }
-
-    if (qi.name == "receiver_type") {
-      receiver_type = qi.inst;
-    }
   }
-  
-  input_ = makeIPMReceiver(receiver_type);
-
-  // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
-  // In the next week, determine what to do if receiver_type isn't known
 }
 
 void
@@ -69,6 +57,8 @@ VectorIntIPMReceiverDAQModule::do_configure(const data_t& config_data)
 
   nIntsPerVector_ = cfg_.nIntsPerVector;
   queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
+
+  input_ = makeIPMReceiver(cfg_.receiver_type);
 
   input_->connect_for_receives(cfg_.connection_info);
 }

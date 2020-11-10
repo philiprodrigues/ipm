@@ -23,6 +23,7 @@ namespace dunedaq::ipm::viir {
         j["nIntsPerVector"] = obj.nIntsPerVector;
         j["queue_timeout_ms"] = obj.queue_timeout_ms;
         j["topic"] = obj.topic;
+        j["receiver_type"] = obj.receiver_type;
         j["connection_info"] = obj.connection_info;
     }
     
@@ -33,6 +34,8 @@ namespace dunedaq::ipm::viir {
             j.at("queue_timeout_ms").get_to(obj.queue_timeout_ms);    
         if (j.contains("topic"))
             j.at("topic").get_to(obj.topic);    
+        if (j.contains("receiver_type"))
+            j.at("receiver_type").get_to(obj.receiver_type);    
         obj.connection_info = j.at("connection_info");
     }
     

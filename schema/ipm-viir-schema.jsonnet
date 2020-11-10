@@ -27,6 +27,7 @@ local viir = {
         s.field("queue_timeout_ms", self.int_attempt, 100,
                 doc="Milliseconds to wait on queue before timing out"),
         s.field("topic", self.string_attempt, "", doc="Optional metadata to include in sends"),
+        s.field("receiver_type", self.string_attempt, "", doc="IPMReceiver Implementation Plugin to load"),
         s.field("connection_info", self.conninfo, doc="Conneection Info"),
     ], doc="VectorIntIPMReceiverDAQModule Configuration"),
 

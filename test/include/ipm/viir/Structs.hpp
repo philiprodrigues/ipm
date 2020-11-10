@@ -38,6 +38,9 @@ namespace dunedaq::ipm::viir {
         // @brief Optional metadata to include in sends
         String topic;
 
+        // @brief IPMReceiver Implementation Plugin to load
+        String receiver_type;
+
         // @brief Conneection Info
         ConnectionInfo connection_info;
     };
