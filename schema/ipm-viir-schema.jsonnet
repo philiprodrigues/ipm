@@ -18,13 +18,16 @@ local viir = {
 
     int_attempt: s.number("Int", "i4",
                      doc="Same as an int in gcc v8.2.0"),
+    string_attempt: s.string("String", "string", doc="String in gcc v8.2.0"),
+    conninfo: s.any("ConnectionInfo", doc="Connection Info passed to connect_for_receives"),
 
     conf: s.record("Conf", [
         s.field("nIntsPerVector", self.size_t_attempt, 10,
                 doc="Number of numbers"),
         s.field("queue_timeout_ms", self.int_attempt, 100,
                 doc="Milliseconds to wait on queue before timing out"),
-                s.field("receiver_type", string, "ZmqReceiver", doc="Receiver plugin type")
+        s.field("topic", self.string_attempt, "", doc="Optional metadata to include in sends"),
+        s.field("connection_info", self.conninfo, doc="Conneection Info"),
     ], doc="VectorIntIPMReceiverDAQModule Configuration"),
 
 };

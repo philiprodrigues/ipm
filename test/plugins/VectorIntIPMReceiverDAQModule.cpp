@@ -70,7 +70,7 @@ VectorIntIPMReceiverDAQModule::do_configure(const data_t& config_data)
   nIntsPerVector_ = cfg_.nIntsPerVector;
   queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
 
-  input_->connect_for_receives(cfg_);
+  input_->connect_for_receives(cfg_.connection_info);
 }
 
 void

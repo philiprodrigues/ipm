@@ -55,10 +55,6 @@ VectorIntIPMSenderDAQModule::init(const data_t& init_data)
     if (qi.name == "sender_type") {
       sender_type = qi.inst;
     }
-
-    if (qi.name == "topic") {
-      topic_ = qi.inst;
-    }
   }
 
   output_ = makeIPMSender(sender_type);
@@ -74,6 +70,7 @@ cfg_ = config_data.get<viis::Conf>();
 
   nIntsPerVector_ = cfg_.nIntsPerVector;
   queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
+  topic_ = cfg_.topic;
 
   output_->connect_for_sends(config_data);
 }

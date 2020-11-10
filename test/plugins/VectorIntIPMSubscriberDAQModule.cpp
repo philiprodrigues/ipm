@@ -43,7 +43,6 @@ VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
 {
 
   std::string subscriber_type = "ZmqSubscriber";
-  std::string topic = "VectorIntTopic";
 
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
@@ -55,14 +54,9 @@ VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
     if (qi.name == "subscriber_type") {
       subscriber_type = qi.inst;
     }
-
-    if (qi.name == "topic") {
-      topic = qi.inst;
-    }
   }
   
   input_ = makeIPMSubscriber(subscriber_type);
-  input_->subscribe(topic);
 
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
   // In the next week, determine what to do if subscriber_type isn't known
@@ -76,6 +70,10 @@ VectorIntIPMSubscriberDAQModule::do_configure(const data_t& config_data)
   nIntsPerVector_ = cfg_.nIntsPerVector;
   queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
 
+  std::string topic = cfg_.topic;
+  ERS_INFO("VIISubDM: topic is " << topic);
+
+  input_->subscribe(topic);
   input_->connect_for_receives(cfg_);
 }
 

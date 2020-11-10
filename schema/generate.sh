@@ -6,13 +6,8 @@
 mydir=$(dirname $(realpath $BASH_SOURCE))
 srcdir=$(dirname $mydir)
 
-# The need for this detail will go away once moo is cleaned up a bit.
-# This obviously John-specific directory is on mu2edaq01.fnal.gov
-oschema=/home/jcfree/moo_work/moo/examples/oschema
 runmoo () {
-    moo -g '/lang:ocpp.jsonnet' \
-        -M $oschema -T $oschema -M $mydir \
-        "$@"
+    moo -g '/lang:ocpp.jsonnet' -M $mydir "$@"
 }
 
 # Wrap up the render command.  This bakes in a mapping to file name
@@ -35,11 +30,8 @@ render () {
     echo $outhpp
 }
 
-render viir Structs $srcdir/test/ipm/viir
-render viir Nljs    $srcdir/test/ipm/viir
+render viir Structs $srcdir/test/include/ipm/viir
+render viir Nljs    $srcdir/test/include/ipm/viir
 
-render viis Structs $srcdir/test/ipm/viis
-render viis Nljs    $srcdir/test/ipm/viis
-
-render viisu Structs $srcdir/test/ipm/viisu
-render viisu Nljs    $srcdir/test/ipm/viisu
+render viis Structs $srcdir/test/include/ipm/viis
+render viis Nljs    $srcdir/test/include/ipm/viis
