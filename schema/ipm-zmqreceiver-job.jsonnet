@@ -12,7 +12,7 @@ local connstr = "tcp://localhost:29870";
 
     cmd.init([cmd.qspec("hose", "StdDeQueue", 10)],
              [cmd.mspec("fdc",  "FakeDataConsumerDAQModule", cmd.qinfo(fdc.queue, qnamec, cmd.qdir.input)),
-              cmd.mspec("viir", "VectorIntIPMReceiver",      cmd.qinfo(viir.queue, qnamec, cmd.qdir.output))
+              cmd.mspec("viir", "VectorIntIPMReceiverDAQModule",      cmd.qinfo(viir.queue, qnamec, cmd.qdir.output))
               ]),
 
 

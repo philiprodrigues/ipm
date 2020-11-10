@@ -35,7 +35,7 @@ VectorIntIPMSenderDAQModule::VectorIntIPMSenderDAQModule(const std::string& name
   , inputQueue_(nullptr)
 {
 
-  register_command("configure", &VectorIntIPMSenderDAQModule::do_configure);
+  register_command("conf", &VectorIntIPMSenderDAQModule::do_configure);
   register_command("start", &VectorIntIPMSenderDAQModule::do_start);
   register_command("stop", &VectorIntIPMSenderDAQModule::do_stop);
 }

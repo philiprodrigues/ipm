@@ -39,7 +39,7 @@
                         ]
                     },
                     "inst": "viis",
-                    "plugin": "VectorIntIPMSender"
+                    "plugin": "VectorIntIPMSenderDAQModule"
                 },
                 {
                     "data": {
@@ -52,7 +52,7 @@
                         ]
                     },
                     "inst": "viir",
-                    "plugin": "VectorIntIPMReceiver"
+                    "plugin": "VectorIntIPMReceiverDAQModule"
                 }
             ],
             "queues": [

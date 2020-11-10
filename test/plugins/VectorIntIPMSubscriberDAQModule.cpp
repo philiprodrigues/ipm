@@ -33,7 +33,7 @@ VectorIntIPMSubscriberDAQModule::VectorIntIPMSubscriberDAQModule(const std::stri
   , outputQueue_(nullptr)
 {
 
-  register_command("configure", &VectorIntIPMSubscriberDAQModule::do_configure);
+  register_command("conf", &VectorIntIPMSubscriberDAQModule::do_configure);
   register_command("start", &VectorIntIPMSubscriberDAQModule::do_start);
   register_command("stop", &VectorIntIPMSubscriberDAQModule::do_stop);
 }

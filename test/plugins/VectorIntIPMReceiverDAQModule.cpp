@@ -33,7 +33,7 @@ VectorIntIPMReceiverDAQModule::VectorIntIPMReceiverDAQModule(const std::string& 
   , outputQueue_(nullptr)
 {
 
-  register_command("configure", &VectorIntIPMReceiverDAQModule::do_configure);
+  register_command("conf", &VectorIntIPMReceiverDAQModule::do_configure);
   register_command("start", &VectorIntIPMReceiverDAQModule::do_start);
   register_command("stop", &VectorIntIPMReceiverDAQModule::do_stop);
 }

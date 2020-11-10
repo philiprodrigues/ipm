@@ -16,8 +16,8 @@ local connstr = "inproc://default";
     cmd.init([cmd.qspec("hose", "StdDeQueue", 10), cmd.qspec("spigot", "StdDeQueue", 10)],
              [cmd.mspec("fdp",  "FakeDataProducerDAQModule", cmd.qinfo(fdp.queue, qnamep, cmd.qdir.output)),
               cmd.mspec("fdc",  "FakeDataConsumerDAQModule", cmd.qinfo(fdc.queue, qnamec, cmd.qdir.input)),
-              cmd.mspec("viis", "VectorIntIPMSender",        cmd.qinfo(viis.queue, qnamep, cmd.qdir.input)),
-              cmd.mspec("viir", "VectorIntIPMReceiver",      cmd.qinfo(viir.queue, qnamec, cmd.qdir.output))
+              cmd.mspec("viis", "VectorIntIPMSenderDAQModule",        cmd.qinfo(viis.queue, qnamep, cmd.qdir.input)),
+              cmd.mspec("viir", "VectorIntIPMReceiverDAQModule",      cmd.qinfo(viir.queue, qnamec, cmd.qdir.output))
               ]),
 
 
