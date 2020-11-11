@@ -12,6 +12,9 @@ find_package(cppzmq REQUIRED)
 find_package(ers REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
+# We don't make a real library, but we need a target called ipm::ipm for dependents to depend on, so they can find the ipm headers
+daq_add_library(dummy.cpp LINK_LIBRARIES ${ZMQ} appfwk::appfwk)
+
 daq_add_plugin(ZmqSender duneIPM LINK_LIBRARIES ${ZMQ} appfwk::appfwk)
 daq_add_plugin(ZmqReceiver duneIPM LINK_LIBRARIES ${ZMQ} appfwk::appfwk)
 daq_add_plugin(ZmqPublisher duneIPM LINK_LIBRARIES ${ZMQ} appfwk::appfwk)
