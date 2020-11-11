@@ -12,8 +12,9 @@ find_package(nlohmann_json)
 
 if (EXISTS ${CMAKE_SOURCE_DIR}/@PROJECT_NAME@)
 
-message(STATUS "Project \"@PROJECT_NAME@\" will be treated as repo (found in ${CMAKE_SOURCE_DIR}/@PROJECT_NAME@)")
-add_library(ipm::ipm ALIAS ipm)
+  message(STATUS "Project \"@PROJECT_NAME@\" will be treated as repo (found in ${CMAKE_SOURCE_DIR}/@PROJECT_NAME@)")
+  add_library(@PROJECT_NAME@::@PROJECT_NAME@ ALIAS @PROJECT_NAME@)
+
 
 else()
 
