@@ -7,6 +7,9 @@
  * received with this code.
  */
 
+#ifndef IPM_PLUGINS_ZMQSENDERIMPL_HPP_
+#define IPM_PLUGINS_ZMQSENDERIMPL_HPP_
+
 #include "TRACE/trace.h"
 
 #include "ipm/Sender.hpp"
@@ -26,7 +29,7 @@ public:
     Push,
   };
 
-  ZmqSenderImpl(SenderType type)
+  explicit ZmqSenderImpl(SenderType type)
     : socket_(ZmqContext::instance().GetContext(),
               type == SenderType::Push ? zmq::socket_type::push : zmq::socket_type::pub)
   {}
@@ -59,8 +62,14 @@ protected:
       zmq::message_t msg(message, N);
       res = socket_.send(msg);
     } while (std::chrono::steady_clock::now() - start_time < timeout && !res);
+
+#if 0 /// TODO, ELF 11/12/2020: Why doesn't this compile?
+    if (!res) {
+      throw SendTimeoutExpired(ERS_HERE);
+    }
+    #endif
+
     TLOG(TLVL_INFO) << "Completed send of " << N << " bytes";
-                       
   }
 
 private:
@@ -70,3 +79,5 @@ private:
 
 } // namespace ipm
 } // namespace dunedaq
+
+#endif // IPM_PLUGINS_ZMQSENDERIMPL_HPP_

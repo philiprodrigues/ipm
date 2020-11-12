@@ -6,7 +6,7 @@ local viis = import "ipm-viis-make.jsonnet";
 
 local qnamep = "hose";            // the name of the single queue in this job
 
-local connstr = "tcp://localhost:29870";
+local connstr = "tcp://127.0.0.1:29870";
 
 [
 

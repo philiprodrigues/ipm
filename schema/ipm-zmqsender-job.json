@@ -55,7 +55,7 @@
                 {
                     "data": {
                         "connection_info": {
-                            "connection_string": "tcp://localhost:29870"
+                            "connection_string": "tcp://127.0.0.1:29870"
                         },
                         "nIntsPerVector": 10,
                         "queue_timeout_ms": 100,

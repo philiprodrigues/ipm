@@ -64,7 +64,7 @@ VectorIntIPMSubscriberDAQModule::do_configure(const data_t& config_data)
   ERS_INFO("VIISubDM: topic is " << topic);
 
   input_->subscribe(topic);
-  input_->connect_for_receives(cfg_);
+  input_->connect_for_receives(cfg_.connection_info);
 }
 
 void

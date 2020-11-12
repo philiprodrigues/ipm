@@ -8,6 +8,9 @@
 
 #include "ipm/Sender.hpp"
 
+#include <string>
+#include <vector>
+
 void
 dunedaq::ipm::Sender::send(const void* message, size_type message_size, const duration_type& timeout, std::string const& metadata)
 {

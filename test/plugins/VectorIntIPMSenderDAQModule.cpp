@@ -66,7 +66,7 @@ cfg_ = config_data.get<viis::Conf>();
   topic_ = cfg_.topic;
 
   output_ = makeIPMSender(cfg_.sender_type);
-  output_->connect_for_sends(config_data);
+  output_->connect_for_sends(cfg_.connection_info);
 }
 
 void
