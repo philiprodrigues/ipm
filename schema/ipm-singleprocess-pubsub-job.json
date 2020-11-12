@@ -39,7 +39,7 @@
                         ]
                     },
                     "inst": "viis",
-                    "plugin": "VectorIntIPMPublisherDAQModule"
+                    "plugin": "VectorIntIPMSenderDAQModule"
                 },
                 {
                     "data": {
