@@ -91,7 +91,7 @@ VectorIntIPMSubscriberDAQModule::do_work(std::atomic<bool>& running_flag)
       TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
       std::vector<int> output(nIntsPerVector_);
 
-
+      try {
       auto recvd = input_->receive(queueTimeout_);
       if (recvd.data.size() == 0) {
         TLOG(TLVL_TRACE) << "No data received, moving to next loop iteration";
@@ -104,6 +104,12 @@ VectorIntIPMSubscriberDAQModule::do_work(std::atomic<bool>& running_flag)
       oss << ": Received vector " << counter << " with size " << output.size() << " on topic " << recvd.metadata;
       ers::info(SubscriberProgressUpdate(ERS_HERE, get_name(), oss.str()));
       oss.str("");
+    }
+    catch (ReceiveTimeoutExpired const& rte)
+    {
+      TLOG(TLVL_TRACE) << "ReceiveTimeoutExpired: " << rte.what();
+      continue;
+    }
 
       TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
       try {

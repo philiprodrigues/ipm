@@ -87,16 +87,21 @@ VectorIntIPMReceiverDAQModule::do_work(std::atomic<bool>& running_flag)
       TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
       std::vector<int> output(nIntsPerVector_);
 
-      auto recvd = input_->receive(queueTimeout_);
+      try {
 
-      if (recvd.data.size() == 0) {
-        TLOG(TLVL_TRACE) << "No data received, moving to next loop iteration";
+        auto recvd = input_->receive(queueTimeout_);
+
+        if (recvd.data.size() == 0) {
+          TLOG(TLVL_TRACE) << "No data received, moving to next loop iteration";
+          continue;
+        }
+
+        assert(recvd.data.size() == nIntsPerVector_ * sizeof(int));
+        memcpy(&output[0], &recvd.data[0], sizeof(int) * nIntsPerVector_);
+      } catch (ReceiveTimeoutExpired const& rte) {
+        TLOG(TLVL_TRACE) << "ReceiveTimeoutExpired: " << rte.what();
         continue;
       }
-
-      assert(recvd.data.size() == nIntsPerVector_ * sizeof(int));
-      memcpy(&output[0], &recvd.data[0], sizeof(int) * nIntsPerVector_);
-
       oss << ": Received vector " << counter << " with size " << output.size();
       ers::info(ReceiverProgressUpdate(ERS_HERE, get_name(), oss.str()));
       oss.str("");
