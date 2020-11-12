@@ -83,11 +83,9 @@ protected:
       }
     } while (std::chrono::steady_clock::now() - start_time < timeout && res == 0);
 
-    #if 0 /// TODO, ELF 11/12/2020: Why doesn't this compile?
     if (res == 0) {
-        throw ReceiveTimeoutExpired(ERS_HERE);
+        throw ReceiveTimeoutExpired(ERS_HERE, timeout.count());
     }
-    #endif
 
     TLOG(TLVL_TRACE + 2) << "Returning output with metadata size " << output.metadata.size() << " and data size "
                     << output.data.size();

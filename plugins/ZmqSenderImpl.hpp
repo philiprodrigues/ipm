@@ -63,11 +63,9 @@ protected:
       res = socket_.send(msg);
     } while (std::chrono::steady_clock::now() - start_time < timeout && !res);
 
-#if 0 /// TODO, ELF 11/12/2020: Why doesn't this compile?
     if (!res) {
-      throw SendTimeoutExpired(ERS_HERE);
+      throw SendTimeoutExpired(ERS_HERE, timeout.count());
     }
-    #endif
 
     TLOG(TLVL_INFO) << "Completed send of " << N << " bytes";
   }
