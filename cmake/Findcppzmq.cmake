@@ -13,11 +13,14 @@ if(EXISTS $ENV{ZMQ_LIB})
     )
   message("Found zmq.hpp in ${cppzmq_INCLUDE_DIR}")
 
+  find_library(ZMQ_LIBRARY NAMES libzmq.so HINTS $ENV{ZMQ_LIB})
+  
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(cppzmq
     FOUND_VAR cppzmq_FOUND
     REQUIRED_VARS
     cppzmq_INCLUDE_DIR
+    ZMQ_LIBRARY
     )
   
   if(cppzmq_FOUND AND NOT TARGET cppzmq::cppzmq)
@@ -28,6 +31,7 @@ if(EXISTS $ENV{ZMQ_LIB})
     set_target_properties(cppzmq::cppzmq PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${cppzmq_INCLUDE_DIR}"
       )
+    target_link_libraries(cppzmq::cppzmq INTERFACE ${ZMQ_LIBRARY})
   endif()
   
 else()
