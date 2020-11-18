@@ -5,14 +5,11 @@
 
 mydir=$(dirname $(realpath $BASH_SOURCE))
 srcdir=$(dirname $mydir)
+appfwkdir=$(realpath $mydir/../../appfwk/schema)
+echo "Mydir $mydir, Appfwkdir $appfwkdir"
 
-# The need for this detail will go away once moo is cleaned up a bit.
-# This obviously John-specific directory is on mu2edaq01.fnal.gov
-oschema=/home/jcfree/moo_work/moo/examples/oschema
 runmoo () {
-    moo -g '/lang:ocpp.jsonnet' \
-        -M $oschema -T $oschema -M $mydir \
-        "$@"
+    moo -g '/lang:ocpp.jsonnet' -M $mydir "$@"
 }
 
 # Wrap up the render command.  This bakes in a mapping to file name
@@ -35,9 +32,22 @@ render () {
     echo $outhpp
 }
 
-render viir Structs $srcdir/test/ipm/viir
-render viir Nljs    $srcdir/test/ipm/viir
+compile () {
+    local name="$1"; shift
 
-render viis Structs $srcdir/test/ipm/viis
-render viis Nljs    $srcdir/test/ipm/viis
+    moo -M $mydir -T $mydir -M $appfwkdir -T $appfwkdir compile ipm-$name-job.jsonnet >ipm-$name-job.json
+}
 
+render viir Structs $srcdir/test/include/ipm/viir
+render viir Nljs    $srcdir/test/include/ipm/viir
+
+render viis Structs $srcdir/test/include/ipm/viis
+render viis Nljs    $srcdir/test/include/ipm/viis
+
+
+compile singleprocess
+compile singleprocess-pubsub
+compile zmqpublisher
+compile zmqreceiver
+compile zmqsender
+compile zmqsubscriber

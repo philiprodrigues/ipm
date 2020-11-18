@@ -103,24 +103,6 @@ protected:
   virtual Response receive_(const duration_type& timeout) = 0;
 };
 
-inline Receiver::Response
-Receiver::receive(const duration_type& timeout, size_type bytes)
-{
-  if (!can_receive()) {
-    throw KnownStateForbidsReceive(ERS_HERE);
-  }
-  auto message = receive_(timeout);
-
-  if (bytes != anysize) {
-    auto received_size = static_cast<size_type>(message.data.size());
-    if (received_size != bytes) {
-      throw UnexpectedNumberOfBytes(ERS_HERE, received_size, bytes);
-    }
-  }
-
-  return message;
-}
-
 std::shared_ptr<Receiver>
 makeIPMReceiver(std::string const& plugin_name)
 {

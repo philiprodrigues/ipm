@@ -35,7 +35,7 @@ VectorIntIPMSenderDAQModule::VectorIntIPMSenderDAQModule(const std::string& name
   , inputQueue_(nullptr)
 {
 
-  register_command("configure", &VectorIntIPMSenderDAQModule::do_configure);
+  register_command("conf", &VectorIntIPMSenderDAQModule::do_configure);
   register_command("start", &VectorIntIPMSenderDAQModule::do_start);
   register_command("stop", &VectorIntIPMSenderDAQModule::do_stop);
 }
@@ -43,21 +43,14 @@ VectorIntIPMSenderDAQModule::VectorIntIPMSenderDAQModule(const std::string& name
 void
 VectorIntIPMSenderDAQModule::init(const data_t& init_data)
 {
-  std::string sender_type = "ZmqSender";
-
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
     if (qi.name == "input") {
       ERS_INFO("VIISDM: input queue is " << qi.inst);
       inputQueue_.reset(new appfwk::DAQSource<std::vector<int>>(qi.inst));
     }
-
-    if (qi.name == "sender_type") {
-      sender_type = qi.inst;
-    }
   }
 
-  output_ = makeIPMSender(sender_type);
 
   // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
   // In the next week, determine what to do if sender_type isn't known
@@ -70,8 +63,10 @@ cfg_ = config_data.get<viis::Conf>();
 
   nIntsPerVector_ = cfg_.nIntsPerVector;
   queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
+  topic_ = cfg_.topic;
 
-  output_->connect_for_sends(config_data);
+  output_ = makeIPMSender(cfg_.sender_type);
+  output_->connect_for_sends(cfg_.connection_info);
 }
 
 void
@@ -105,7 +100,7 @@ VectorIntIPMSenderDAQModule::do_work(std::atomic<bool>& running_flag)
       }
 
       TLOG(TLVL_TRACE) << get_name() << ": Received vector of size " << vec.size() << " from queue, sending";
-      output_->send(&vec[0], vec.size() * sizeof(int), queueTimeout_);
+      output_->send(&vec[0], vec.size() * sizeof(int), queueTimeout_, topic_);
 
       counter++;
       oss << ": Sent " << counter << " vectors";

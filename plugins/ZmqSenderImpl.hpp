@@ -7,6 +7,8 @@
  * received with this code.
  */
 
+#ifndef IPM_PLUGINS_ZMQSENDERIMPL_HPP_
+#define IPM_PLUGINS_ZMQSENDERIMPL_HPP_
 
 #include "TRACE/trace.h"
 
@@ -23,19 +25,20 @@ class ZmqSenderImpl : public Sender
 public:
   enum class SenderType
   {
-  Publisher,
-  Push,
+    Publisher,
+    Push,
   };
 
-  ZmqSenderImpl(SenderType type)
-    : socket_(ZmqContext::instance().GetContext(), type == SenderType::Push ? zmq::socket_type::push : zmq::socket_type::pub)
-  {
-  }
+  explicit ZmqSenderImpl(SenderType type)
+    : socket_(ZmqContext::instance().GetContext(),
+              type == SenderType::Push ? zmq::socket_type::push : zmq::socket_type::pub)
+  {}
   bool can_send() const noexcept override { return socket_connected_; }
   void connect_for_sends(const nlohmann::json& connection_info)
   {
     std::string connection_string = connection_info.value<std::string>("connection_string", "inproc://default");
     TLOG(TLVL_INFO) << "Connection String is " << connection_string;
+    socket_.setsockopt(ZMQ_SNDTIMEO, 1); // 1 ms, we'll repeat until we reach timeout
     socket_.bind(connection_string);
     socket_connected_ = true;
   }
@@ -43,22 +46,28 @@ public:
 protected:
   void send_(const void* message, int N, const duration_type& timeout, std::string const& topic) override
   {
+    TLOG(TLVL_INFO) << "Starting send of " << N << " bytes";
+    auto start_time = std::chrono::steady_clock::now();
+    bool res = false;
+    do {
 
-    auto timeout_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count();
+      zmq::message_t topic_msg(topic.c_str(), topic.size());
+      res = socket_.send(topic_msg, ZMQ_SNDMORE);
 
-    // The "2" is because there are two 0MQ sends in this
-    // function. Hopefully most timeouts are even, and more than
-    // several milliseconds...
+      if (!res) {
+        TLOG(TLVL_INFO) << "Unable to send message";
+        continue;
+      }
 
-    timeout_in_ms /= 2;  
+      zmq::message_t msg(message, N);
+      res = socket_.send(msg);
+    } while (std::chrono::steady_clock::now() - start_time < timeout && !res);
 
-    socket_.setsockopt(ZMQ_SNDTIMEO, timeout_in_ms ); 
+    if (!res) {
+      throw SendTimeoutExpired(ERS_HERE, timeout.count());
+    }
 
-    zmq::message_t topic_msg(topic.c_str(), topic.size());
-    socket_.send(topic_msg, ZMQ_SNDMORE);
-
-    zmq::message_t msg(message, N);
-    socket_.send(msg);
+    TLOG(TLVL_INFO) << "Completed send of " << N << " bytes";
   }
 
 private:
@@ -66,6 +75,7 @@ private:
   bool socket_connected_;
 };
 
-
 } // namespace ipm
 } // namespace dunedaq
+
+#endif // IPM_PLUGINS_ZMQSENDERIMPL_HPP_

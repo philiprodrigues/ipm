@@ -33,7 +33,7 @@ VectorIntIPMSubscriberDAQModule::VectorIntIPMSubscriberDAQModule(const std::stri
   , outputQueue_(nullptr)
 {
 
-  register_command("configure", &VectorIntIPMSubscriberDAQModule::do_configure);
+  register_command("conf", &VectorIntIPMSubscriberDAQModule::do_configure);
   register_command("start", &VectorIntIPMSubscriberDAQModule::do_start);
   register_command("stop", &VectorIntIPMSubscriberDAQModule::do_stop);
 }
@@ -41,31 +41,13 @@ VectorIntIPMSubscriberDAQModule::VectorIntIPMSubscriberDAQModule(const std::stri
 void
 VectorIntIPMSubscriberDAQModule::init(const data_t& init_data)
 {
-
-  std::string Subscriber_type = "ZmqSubscriber";
-  std::string topic = "VectorIntTopic";
-
   auto ini = init_data.get<appfwk::cmd::ModInit>();
   for (const auto& qi : ini.qinfos) {
     if (qi.name == "output") {
       ERS_INFO("VIIRDM: output queue is " << qi.inst);
       outputQueue_.reset(new appfwk::DAQSink<std::vector<int>>(qi.inst));
     }
-
-    if (qi.name == "Subscriber_type") {
-      Subscriber_type = qi.inst;
-    }
-
-    if (qi.name == "topic") {
-      topic = qi.inst;
-    }
   }
-  
-  input_ = makeIPMSubscriber(Subscriber_type);
-  input_->subscribe(topic);
-
-  // TODO: John Freeman (jcfree@fnal.gov), Oct-22-2020
-  // In the next week, determine what to do if Subscriber_type isn't known
 }
 
 void
@@ -76,7 +58,13 @@ VectorIntIPMSubscriberDAQModule::do_configure(const data_t& config_data)
   nIntsPerVector_ = cfg_.nIntsPerVector;
   queueTimeout_ = static_cast<std::chrono::milliseconds>(cfg_.queue_timeout_ms);
 
-  input_->connect_for_receives(cfg_);
+  input_ = makeIPMSubscriber(cfg_.receiver_type);
+
+  std::string topic = cfg_.topic;
+  ERS_INFO("VIISubDM: topic is " << topic);
+
+  input_->subscribe(topic);
+  input_->connect_for_receives(cfg_.connection_info);
 }
 
 void
@@ -103,13 +91,25 @@ VectorIntIPMSubscriberDAQModule::do_work(std::atomic<bool>& running_flag)
       TLOG(TLVL_TRACE) << get_name() << ": Creating output vector";
       std::vector<int> output(nIntsPerVector_);
 
+      try {
       auto recvd = input_->receive(queueTimeout_);
+      if (recvd.data.size() == 0) {
+        TLOG(TLVL_TRACE) << "No data received, moving to next loop iteration";
+        continue;
+      }
+
       assert(recvd.data.size() == nIntsPerVector_ * sizeof(int));
       memcpy(&output[0], &recvd.data[0], sizeof(int) * nIntsPerVector_);
 
       oss << ": Received vector " << counter << " with size " << output.size() << " on topic " << recvd.metadata;
       ers::info(SubscriberProgressUpdate(ERS_HERE, get_name(), oss.str()));
       oss.str("");
+    }
+    catch (ReceiveTimeoutExpired const& rte)
+    {
+      TLOG(TLVL_TRACE) << "ReceiveTimeoutExpired: " << rte.what();
+      continue;
+    }
 
       TLOG(TLVL_TRACE) << get_name() << ": Pushing vector into outputQueue";
       try {
