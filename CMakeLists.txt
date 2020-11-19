@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(ipm VERSION 0.0.0)
 
-find_package(daq-buildtools 1.2.1 REQUIRED)
+find_package(daq-cmake 1.0.0 REQUIRED)
 
 daq_setup_environment()
 
