@@ -14,10 +14,10 @@ find_package(nlohmann_json REQUIRED)
 
 daq_add_library(Receiver.cpp Sender.cpp LINK_LIBRARIES appfwk::appfwk cppzmq::cppzmq)
 
-daq_add_plugin(ZmqSender duneIPM LINK_LIBRARIES ${ZMQ} ipm)
-daq_add_plugin(ZmqReceiver duneIPM LINK_LIBRARIES ${ZMQ} ipm)
-daq_add_plugin(ZmqPublisher duneIPM LINK_LIBRARIES ${ZMQ} ipm)
-daq_add_plugin(ZmqSubscriber duneIPM LINK_LIBRARIES ${ZMQ} ipm)
+daq_add_plugin(ZmqSender duneIPM LINK_LIBRARIES ipm)
+daq_add_plugin(ZmqReceiver duneIPM LINK_LIBRARIES ipm)
+daq_add_plugin(ZmqPublisher duneIPM LINK_LIBRARIES ipm)
+daq_add_plugin(ZmqSubscriber duneIPM LINK_LIBRARIES ipm)
 
 daq_add_plugin(VectorIntIPMSenderDAQModule duneDAQModule TEST LINK_LIBRARIES ipm)
 daq_add_plugin(VectorIntIPMReceiverDAQModule duneDAQModule TEST LINK_LIBRARIES ipm)
