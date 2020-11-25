@@ -34,7 +34,7 @@
 #include <vector>
 
 namespace dunedaq {
-ERS_DECLARE_ISSUE(ipm, KnownStateForbidsReceive, "Receiver not in a state to send data", )
+ERS_DECLARE_ISSUE(ipm, KnownStateForbidsReceive, "Receiver not in a state to receive data", )
 ERS_DECLARE_ISSUE(ipm,
                   UnexpectedNumberOfBytes,
                   "Expected " << bytes1 << " bytes in message but received " << bytes2,

@@ -11,6 +11,7 @@
  * - Implement the public virtual can_receive function
  * - Implement the public virtual connect_for_receives function
  * - Implement the public virtual subscribe function
+ * - Implement the public virtual unsubscribe function
  *
  * And is encouraged to:
  *
